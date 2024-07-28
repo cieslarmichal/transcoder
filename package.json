@@ -1,0 +1,39 @@
+{
+  "name": "transcoder",
+  "scripts": {
+    "build": "turbo run build",
+    "build:dev": "turbo run build:dev",
+    "test:unit": "turbo run test:unit:run --concurrency 5",
+    "test:integration": "turbo run test:integration:run --concurrency 5",
+    "lint": "turbo run lint --concurrency 5",
+    "lint:fix": "turbo run lint:fix"
+  },
+  "devDependencies": {
+    "@types/node": "20.14.0",
+    "@typescript-eslint/eslint-plugin": "7.12.0",
+    "@typescript-eslint/parser": "7.12.0",
+    "eslint": "8.57.0",
+    "eslint-config-prettier": "9.1.0",
+    "eslint-import-resolver-typescript": "3.6.1",
+    "eslint-plugin-import": "2.29.1",
+    "eslint-plugin-prettier": "5.1.3",
+    "prettier": "3.3.1",
+    "prettier-eslint": "16.3.0",
+    "ts-node": "10.9.2",
+    "turbo": "2.0.3",
+    "typescript": "5.5.4",
+    "vitest": "1.6.0"
+  },
+  "volta": {
+    "node": "20.14.0",
+    "npm": "10.8.2"
+  },
+  "engines": {
+    "node": "20.14.0"
+  },
+  "workspaces": [
+    "apps/*",
+    "common/*"
+  ],
+  "packageManager": "npm@10.8.2"
+}
