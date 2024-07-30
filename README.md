@@ -34,17 +34,6 @@ flowchart TB
 
     RABBITMQ -->|12. Fetches notification task| NOTIFIER
     NOTIFIER -->|13. Sends an email to the user| EMAIL_PROVIDER
-
-    classDef api fill:#ffcccc,stroke:#333,stroke-width:2px;
-    classDef service fill:#cce5ff,stroke:#333,stroke-width:2px;
-    classDef queue fill:#ffffcc,stroke:#333,stroke-width:2px;
-    classDef storage fill:#ccffcc,stroke:#333,stroke-width:2px;
-    classDef redis fill:#ff9999,stroke:#333,stroke-width:2px;
-
-    class API,DOWNLOADER,UPLOADER,NOTIFIER,ENCODER service;
-    class RABBITMQ queue;
-    class S3 storage;
-    class REDIS redis;
 ```
 
 ## Services
