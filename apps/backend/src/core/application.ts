@@ -1,8 +1,6 @@
 import { ApplicationHttpController } from './api/httpControllers/applicationHttpController/applicationHttpController.js';
 import { type Config, ConfigFactory } from './config.js';
 import { HttpServer } from './httpServer.js';
-import { coreSymbols, symbols } from './symbols.js';
-import { BookModule } from '../modules/bookModule/bookModule.js';
 
 export class Application {
   public static createContainer(): DependencyInjectionContainer {
