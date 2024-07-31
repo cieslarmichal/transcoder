@@ -17,23 +17,24 @@ flowchart TB
 
   REDIS[Redis]:::db
 
-  USERS -->|1. Sends a file by HTTP| API
-  API -->|2. Uploads a file| S3
-  API -->|3. Sends source file ready message| RABBITMQ
+  USERS -->|1. file by http| API
+  API -->|2. file upload| S3
+  API -->|3. done| RABBITMQ
 
-  RABBITMQ -->|4. Fetches a file URL to download| DOWNLOADER
-  DOWNLOADER -->|5. Downloads a file| S3
-  DOWNLOADER -->|6. Sends downloading done message| RABBITMQ
+  RABBITMQ -->|4. url to download| DOWNLOADER
+  DOWNLOADER -->|5. file download| S3
+  DOWNLOADER -->|6. done| RABBITMQ
 
-  RABBITMQ -->|7. Fetches downloading done message| ENCODER
-  ENCODER -->|8. Saves encoding progress| REDIS
-  ENCODER -->|9. Sends encoding done message| RABBITMQ
+  RABBITMQ -->|7. url with target format| ENCODER
+  ENCODER -->|8. save progress| REDIS
+  ENCODER -->|9. done| RABBITMQ
 
-  RABBITMQ -->|10. Fetches encoding done message| UPLOADER
-  UPLOADER -->|11. Sends uploading done message| RABBITMQ
+  RABBITMQ -->|10. encoded file path| UPLOADER
+  UPLOADER -->|11. file upload| S3
+  UPLOADER -->|12. done| RABBITMQ
 
-  RABBITMQ -->|12. Fetches uploading done message| NOTIFIER
-  NOTIFIER -->|13. Sends an email to the user| EMAIL_PROVIDER
+  RABBITMQ -->|13. email and url| NOTIFIER
+  NOTIFIER -->|14. send email| EMAIL_PROVIDER
 
   classDef db,external,service color:#fff
   classDef db fill:#ff9655,stroke:#ffa764
