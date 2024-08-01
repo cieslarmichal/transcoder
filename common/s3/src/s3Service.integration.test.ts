@@ -2,11 +2,9 @@ import { createReadStream } from 'node:fs';
 import path from 'path';
 import { expect, describe, it, beforeEach, afterEach } from 'vitest';
 
-import { S3ClientFactory } from './s3ClientFactory.js';
+import { AwsRegion, S3ClientFactory } from './s3ClientFactory.js';
 import { S3Service } from './s3Service.js';
 import { S3TestUtils } from '../tests/s3TestUtils.js';
-import { Generator } from '../../../tests/generator.js';
-import { ConfigFactory } from '../../core/config.js';
 
 describe('S3Service', () => {
   let s3Service: S3Service;
@@ -20,13 +18,11 @@ describe('S3Service', () => {
   const bucketName = 'misyma-images';
 
   beforeEach(async () => {
-    const config = ConfigFactory.create();
-
     const s3Client = S3ClientFactory.create({
-      accessKeyId: config.aws.accessKeyId,
-      secretAccessKey: config.aws.secretAccessKey,
-      region: config.aws.region,
-      endpoint: config.aws.endpoint as string,
+      accessKeyId: 'test',
+      secretAccessKey: 'test',
+      region: AwsRegion.euCentral1,
+      endpoint: 'http://127.0.0.1:4566',
     });
 
     s3Service = new S3Service(s3Client);
@@ -42,7 +38,7 @@ describe('S3Service', () => {
 
   describe('exists', () => {
     it('returns false - when bucket does not exist', async () => {
-      const nonExistingBucketName = Generator.word();
+      const nonExistingBucketName = 'non-existing-bucket';
 
       const resourceExists = await s3Service.blobExists({
         bucketName: nonExistingBucketName,
@@ -53,7 +49,7 @@ describe('S3Service', () => {
     });
 
     it('returns false - when resource does not exist', async () => {
-      const nonExistingResourceName = Generator.word();
+      const nonExistingResourceName = 'non-existing-resource';
 
       const resourceExists = await s3Service.blobExists({
         bucketName,
@@ -77,7 +73,7 @@ describe('S3Service', () => {
 
   describe('delete', () => {
     it('throws an error - when bucket does not exist', async () => {
-      const nonExistingBucketName = Generator.word();
+      const nonExistingBucketName = 'non-existing-bucket';
 
       try {
         await s3Service.deleteBlob({
@@ -94,7 +90,7 @@ describe('S3Service', () => {
     });
 
     it('throws an error - when resource does not exist', async () => {
-      const nonExistingResourceName = Generator.word();
+      const nonExistingResourceName = 'non-existing-resource';
 
       try {
         await s3Service.deleteBlob({
@@ -132,7 +128,7 @@ describe('S3Service', () => {
     it('throws an error - when bucket does not exist', async () => {
       const filePath = path.join(resourcesDirectory, sampleFileName1);
 
-      const nonExistingBucketName = Generator.word();
+      const nonExistingBucketName = 'non-existing-bucket';
 
       try {
         await s3Service.uploadBlob({

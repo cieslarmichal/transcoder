@@ -4,7 +4,7 @@ import { DeleteObjectCommand, ListObjectsV2Command, type S3Client } from '@aws-s
 import { Upload } from '@aws-sdk/lib-storage';
 import { type Readable } from 'node:stream';
 
-import { OperationNotValidError } from '../../common/errors/operationNotValidError.js';
+import { OperationNotValidError } from '@common/errors';
 
 export interface UploadBlobPayload {
   readonly blobName: string;

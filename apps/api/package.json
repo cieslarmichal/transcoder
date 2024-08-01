@@ -1,0 +1,42 @@
+{
+  "name": "@apps/api",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "start:dev": "node --watch --inspect --no-warnings=ExperimentalWarning --experimental-specifier-resolution=node --loader ts-node/esm/transpile-only src/index.ts",
+    "build": "tsc --build tsconfig.json",
+    "build:dev": "tsc --build tsconfig.dev.json",
+    "test:unit": "vitest .unit.test.ts --config vitest.unit.config.js",
+    "test:unit:run": "npm run test:unit -- --run",
+    "test:integration": "NODE_ENV=test vitest --config vitest.integration.config.js .integration.test.ts",
+    "test:integration:run": "npm run test:integration -- --run",
+    "lint": "eslint . --ext .ts --cache --max-warnings 0",
+    "lint:fix": "npm run lint -- --fix"
+  },
+  "dependencies": {
+    "@common/contracts": "*",
+    "@common/errors": "*",
+    "@common/logger": "*",
+    "@common/s3": "*",
+    "@fastify/cors": "9.0.1",
+    "@fastify/helmet": "11.1.1",
+    "@fastify/multipart": "8.3.0",
+    "@fastify/swagger": "8.14.0",
+    "@fastify/swagger-ui": "3.1.0",
+    "@fastify/type-provider-typebox": "4.0.0",
+    "fastify": "4.27.0",
+    "uuid": "10.0.0"
+  },
+  "devDependencies": {
+    "@common/tests": "*",
+    "@types/uuid": "9.0.8"
+  },
+  "volta": {
+    "node": "20.14.0",
+    "npm": "10.8.2"
+  },
+  "engines": {
+    "node": "20.14.0"
+  }
+}
