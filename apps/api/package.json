@@ -25,8 +25,7 @@
     "@fastify/swagger": "8.15.0",
     "@fastify/swagger-ui": "3.1.0",
     "@fastify/type-provider-typebox": "4.1.0",
-    "fastify": "4.28.1",
-    "uuid": "10.0.0"
+    "fastify": "4.28.1"
   },
   "devDependencies": {
     "@faker-js/faker": "9.0.0",

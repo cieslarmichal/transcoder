@@ -1,7 +1,7 @@
-import { v4 as uuidv4 } from 'uuid';
+import { randomUUID } from 'node:crypto';
 
 export class UuidService {
   public generateUuid(): string {
-    return uuidv4();
+    return randomUUID();
   }
 }
