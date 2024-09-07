@@ -36,11 +36,11 @@ export class UploadVideoAction {
       notificationEmail,
     });
 
-    const traceId = this.uuidService.generateUuid();
+    const blobId = this.uuidService.generateUuid();
 
     await this.s3Service.uploadBlob({
       bucketName,
-      blobName: traceId,
+      blobName: blobId,
       data,
       contentType,
     });
@@ -53,6 +53,6 @@ export class UploadVideoAction {
 
     // TODO: send rabbitmq message
 
-    return { traceId };
+    return { traceId: blobId };
   }
 }

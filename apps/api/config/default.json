@@ -9,8 +9,6 @@
     "accessKeyId": null,
     "secretAccessKey": null,
     "region": "eu-central-1",
-    "endpoint": null,
-    "bucketName": "transcoder-artifacts",
-    "cloudfrontUrl": "https://d35v5fqwflm78g.cloudfront.net"
+    "bucketName": "transcoder-artifacts"
   }
 }
