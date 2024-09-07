@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import { BaseError } from '@common/errors';
 import { LoggerFactory } from '@common/logger';
 

@@ -11,7 +11,7 @@
     "test:unit:run": "npm run test:unit -- --run",
     "test:integration": "NODE_ENV=test vitest --config vitest.integration.config.js .integration.test.ts",
     "test:integration:run": "npm run test:integration -- --run",
-    "lint": "eslint . --ext .ts --cache --max-warnings 0",
+    "lint": "eslint . -c ../../eslint.config.mjs --max-warnings 0",
     "lint:fix": "npm run lint -- --fix"
   },
   "dependencies": {

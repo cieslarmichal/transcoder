@@ -169,7 +169,6 @@ export class HttpServer {
   }
 
   private addRequestPreprocessing(): void {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
     this.fastifyServer.addHook('preValidation', (request, _reply, next) => {
       const body = request.body as Record<string, unknown>;
 
