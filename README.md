@@ -17,29 +17,66 @@ flowchart TB
 
   REDIS[Redis]:::db
 
-  USERS -->|1. file by http| API
-  API -->|2. file upload| S3
-  API -->|3. done| RABBITMQ
+  USERS -->|video by http| API
+  API -->|video upload| S3
+  API -->|done| RABBITMQ
 
-  RABBITMQ -->|4. url to download| DOWNLOADER
-  DOWNLOADER -->|5. file download| S3
-  DOWNLOADER -->|6. done| RABBITMQ
+  RABBITMQ -->|url to download| DOWNLOADER
+  DOWNLOADER -->|video download| S3
+  DOWNLOADER -->|done| RABBITMQ
 
-  RABBITMQ -->|7. url with target format| ENCODER
-  ENCODER -->|8. save progress| REDIS
-  ENCODER -->|9. done| RABBITMQ
+  RABBITMQ -->|url with target format| ENCODER
+  ENCODER -->|save progress| REDIS
+  ENCODER -->|done| RABBITMQ
 
-  RABBITMQ -->|10. encoded file path| UPLOADER
-  UPLOADER -->|11. file upload| S3
-  UPLOADER -->|12. done| RABBITMQ
+  RABBITMQ -->|encoded file path| UPLOADER
+  UPLOADER -->|file upload| S3
+  UPLOADER -->|done| RABBITMQ
 
-  RABBITMQ -->|13. email and url| NOTIFIER
-  NOTIFIER -->|14. send email| EMAIL_PROVIDER
+  RABBITMQ -->|email and url| NOTIFIER
+  NOTIFIER -->|send email| EMAIL_PROVIDER
 
-  classDef db,external,service color:#fff
-  classDef db fill:#ff9655,stroke:#ffa764
-  classDef external fill:#9b84d0,stroke:#9676d7
-  classDef service fill:#3b5dae,stroke:#97a9d3
+  classDef db color:#fff,fill:#ff9655,stroke:#ffa764,stroke-width:2px;
+  classDef external color:#fff,fill:#9b84d0,stroke:#9676d7,stroke-width:2px;
+  classDef service color:#fff,fill:#3b5dae,stroke:#97a9d3,stroke-width:2px;
+```
+
+## RabbitMQ Architecture
+
+```mermaid
+flowchart TB
+  API[API Service]:::service
+  DOWNLOADER[Downloader Service]:::service
+  ENCODER[Encoder Service]:::service
+  UPLOADER[Uploader Service]:::service
+  NOTIFIER[Notifier Service]:::service
+
+  INGESTED_VIDEOS[Ingested Videos Queue]:::queue
+  DOWNLOADED_VIDEOS[Downloaded Videos Queue]:::queue
+  ENCODED_VIDEOS[Encoded Videos Queue]:::queue
+  UPLOADED_ARTIFACTS[Uploaded Artifacts Queue]:::queue
+
+  EXCHANGE[Transcoder Exchange]:::exchange
+
+  API -->|video.ingested| EXCHANGE
+  EXCHANGE --> INGESTED_VIDEOS
+  INGESTED_VIDEOS --> DOWNLOADER
+
+  DOWNLOADER -->|video.downloaded| EXCHANGE
+  EXCHANGE --> DOWNLOADED_VIDEOS
+  DOWNLOADED_VIDEOS --> ENCODER
+  
+  ENCODER -->|video.encoded| EXCHANGE
+  EXCHANGE --> ENCODED_VIDEOS
+  ENCODED_VIDEOS --> UPLOADER
+
+  UPLOADER -->|artifact.uploaded| EXCHANGE
+  EXCHANGE --> UPLOADED_ARTIFACTS
+  UPLOADED_ARTIFACTS --> NOTIFIER
+
+  classDef queue color:#fff,fill:#ff9655,stroke:#ffa764,stroke-width:2px;
+  classDef exchange color:#fff,fill:#9b84d0,stroke:#9676d7,stroke-width:2px;
+  classDef service color:#fff,fill:#3b5dae,stroke:#97a9d3,stroke-width:2px;
 ```
 
 ## Services
