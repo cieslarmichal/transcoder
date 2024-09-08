@@ -10,5 +10,8 @@
     "secretAccessKey": null,
     "region": "eu-central-1",
     "bucketName": "transcoder-artifacts"
+  },
+  "amqp": {
+    "url": "amqp://test:test@localhost:5672"
   }
 }

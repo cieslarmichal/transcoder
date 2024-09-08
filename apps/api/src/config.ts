@@ -24,6 +24,9 @@ const configSchema = Type.Object({
     endpoint: Type.Optional(Type.String({ minLength: 1 })),
     bucketName: Type.String({ minLength: 1 }),
   }),
+  amqp: Type.Object({
+    url: Type.String({ minLength: 1 }),
+  }),
 });
 
 export type Config = Static<typeof configSchema>;
