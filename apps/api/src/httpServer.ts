@@ -9,7 +9,6 @@ import { fastifySwaggerUi } from '@fastify/swagger-ui';
 import { type TypeBoxTypeProvider } from '@fastify/type-provider-typebox';
 import { fastify, type FastifyInstance } from 'fastify';
 import { type FastifySchemaValidationError } from 'fastify/types/schema.js';
-import { type Server } from 'http';
 
 import { BaseError, InputNotValidError, OperationNotValidError, ResourceNotFoundError } from '@common/errors';
 import { type Logger } from '@common/logger';
@@ -89,8 +88,10 @@ export class HttpServer {
     });
   }
 
-  public getInternalServerInstance(): Server {
-    return this.fastifyServer.server;
+  public async stop(): Promise<void> {
+    await this.fastifyServer.close();
+
+    this.loggerService.info({ message: 'HTTP Server stopped.' });
   }
 
   private setupErrorHandler(): void {
@@ -158,7 +159,7 @@ export class HttpServer {
     });
 
     await this.fastifyServer.register(fastifySwaggerUi, {
-      routePrefix: '/api/docs',
+      routePrefix: '/api/v1/docs',
       uiConfig: {
         defaultModelRendering: 'model',
         defaultModelsExpandDepth: 3,

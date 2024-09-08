@@ -23,7 +23,7 @@ export interface NormalizePathPayload {
 }
 
 export class HttpRouter {
-  private readonly rootPath = '/api';
+  private readonly rootPath = '/api/v1';
 
   public constructor(private readonly fastifyServer: FastifyInstance) {}
 
