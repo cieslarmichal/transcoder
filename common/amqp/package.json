@@ -1,5 +1,5 @@
 {
-  "name": "@common/s3",
+  "name": "@common/amqp",
   "type": "module",
   "exports": {
     ".": {

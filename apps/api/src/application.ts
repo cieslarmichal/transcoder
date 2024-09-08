@@ -1,6 +1,6 @@
+import { AmqpProvisioner } from '@common/amqp';
 import { type Logger, LoggerFactory } from '@common/logger';
 import { S3ClientFactory, S3Service } from '@common/s3';
-import { exchangeName, queueNames, routingKeys } from '@common/contracts';
 
 import { UploadVideoAction } from './actions/uploadVideoAction/uploadVideoAction.js';
 import { ApplicationHttpController } from './api/httpControllers/applicationHttpController/applicationHttpController.js';
@@ -8,13 +8,15 @@ import { VideoHttpController } from './api/httpControllers/videoHttpController/v
 import { UuidService } from './common/uuid/uuidService.js';
 import { type Config, ConfigFactory } from './config.js';
 import { HttpServer } from './httpServer.js';
-import { connect, type Connection } from 'amqplib';
+import { type Connection } from 'amqplib';
+import { exchangeName, queueNames, routingKeys } from '@common/contracts';
 
 export class Application {
   private readonly config: Config;
   private readonly logger: Logger;
   private readonly httpServer: HttpServer;
   private amqpConnection: Connection | undefined;
+  private readonly amqpProvisioner: AmqpProvisioner;
 
   public constructor() {
     this.config = ConfigFactory.create();
@@ -35,12 +37,14 @@ export class Application {
     const videoHttpController = new VideoHttpController(uploadVideoAction);
 
     this.httpServer = new HttpServer([applicationHttpController, videoHttpController], this.logger, this.config);
+
+    this.amqpProvisioner = new AmqpProvisioner(this.logger);
   }
 
   public async start(): Promise<void> {
     await this.httpServer.start();
 
-    this.amqpConnection = await this.setupAmqp();
+    await this.setupAmqp();
   }
 
   public async stop(): Promise<void> {
@@ -49,59 +53,21 @@ export class Application {
     await this.amqpConnection?.close();
   }
 
-  private async setupAmqp(): Promise<Connection> {
-    const connection = await connect(this.config.amqp.url);
-
-    connection.addListener('close', () => {
-      this.logger.debug({ message: 'AMQP connection closed' });
+  private async setupAmqp(): Promise<void> {
+    this.amqpConnection = await this.amqpProvisioner.createConnection({
+      url: this.config.amqp.url,
     });
 
-    connection.addListener('error', (error) => {
-      this.logger.error({ message: 'AMQP connection error', error });
+    const channel = await this.amqpProvisioner.createChannel({
+      connection: this.amqpConnection,
     });
 
-    connection.addListener('blocked', () => {
-      this.logger.debug({ message: 'AMQP connection blocked' });
+    await this.amqpProvisioner.createQueue({
+      channel,
+      exchangeName,
+      queueName: queueNames.ingestedVideos,
+      pattern: routingKeys.videoIngested,
+      dlqMessageTtl: this.config.amqp.messageTtl,
     });
-
-    connection.addListener('unblocked', () => {
-      this.logger.debug({ message: 'AMQP connection unblocked' });
-    });
-
-    const channel = await connection.createChannel();
-
-    channel.addListener('close', () => {
-      this.logger.debug({ message: 'AMQP channel closed' });
-    });
-
-    channel.addListener('error', (error) => {
-      this.logger.error({ message: 'AMQP channel error', error });
-    });
-
-    channel.addListener('drain', () => {
-      this.logger.debug({ message: 'AMQP channel drained' });
-    });
-
-    await channel.assertExchange(exchangeName, 'topic');
-
-    const retryExchangeName = `${exchangeName}.retry`;
-
-    await channel.assertExchange(retryExchangeName, 'topic');
-
-    await channel.assertQueue(queueNames.ingestedVideos, {
-      deadLetterExchange: retryExchangeName,
-      messageTtl: this.config.amqp.messageTtl,
-    });
-
-    await channel.assertQueue(`${queueNames.ingestedVideos}.retry`, {
-      deadLetterExchange: retryExchangeName,
-      messageTtl: this.config.amqp.messageTtl,
-    });
-
-    await channel.bindQueue(queueNames.ingestedVideos, exchangeName, routingKeys.videoIngested);
-
-    await channel.bindQueue(`${queueNames.ingestedVideos}.retry`, retryExchangeName, routingKeys.videoIngested);
-
-    return connection;
   }
 }
