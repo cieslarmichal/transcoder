@@ -12,6 +12,8 @@
     "bucketName": "transcoder-artifacts"
   },
   "amqp": {
-    "url": "amqp://test:test@localhost:5672"
+    "url": "amqp://test:test@localhost:5672",
+    "redeliveryDropThreshold": 5,
+    "messageTtl": 60000
   }
 }

@@ -51,12 +51,12 @@ flowchart TB
   UPLOADER[Uploader Service]:::service
   NOTIFIER[Notifier Service]:::service
 
-  INGESTED_VIDEOS[Ingested Videos Queue]:::queue
-  DOWNLOADED_VIDEOS[Downloaded Videos Queue]:::queue
-  ENCODED_VIDEOS[Encoded Videos Queue]:::queue
-  UPLOADED_ARTIFACTS[Uploaded Artifacts Queue]:::queue
+  INGESTED_VIDEOS[ingested-videos queue]:::queue
+  DOWNLOADED_VIDEOS[downloaded-videos queue]:::queue
+  ENCODED_VIDEOS[encoded-videos queue]:::queue
+  UPLOADED_ARTIFACTS[uploaded-artifacts queue]:::queue
 
-  EXCHANGE[Transcoder Exchange]:::exchange
+  EXCHANGE[transcoder exchange]:::exchange
 
   API -->|video.ingested| EXCHANGE
   EXCHANGE --> INGESTED_VIDEOS
