@@ -8,14 +8,15 @@ import { VideoHttpController } from './api/httpControllers/videoHttpController/v
 import { UuidService } from './common/uuid/uuidService.js';
 import { type Config, ConfigFactory } from './config.js';
 import { HttpServer } from './httpServer.js';
-import { type Connection } from 'amqplib';
+import { type Channel, type Connection } from 'amqplib';
 import { exchangeName, queueNames, routingKeys } from '@common/contracts';
 
 export class Application {
   private readonly config: Config;
   private readonly logger: Logger;
-  private readonly httpServer: HttpServer;
+  private httpServer: HttpServer | undefined;
   private amqpConnection: Connection | undefined;
+  private amqpChannel: Channel | undefined;
   private readonly amqpProvisioner: AmqpProvisioner;
 
   public constructor() {
@@ -26,29 +27,35 @@ export class Application {
       logLevel: this.config.logLevel,
     });
 
+    this.amqpProvisioner = new AmqpProvisioner(this.logger);
+  }
+
+  public async start(): Promise<void> {
+    await this.setupAmqp();
+
     const uuidService = new UuidService();
 
     const s3Service = new S3Service(S3ClientFactory.create(this.config.aws));
 
     const applicationHttpController = new ApplicationHttpController();
 
-    const uploadVideoAction = new UploadVideoAction(s3Service, uuidService, this.config, this.logger);
+    const uploadVideoAction = new UploadVideoAction(
+      this.amqpChannel as Channel,
+      s3Service,
+      uuidService,
+      this.config,
+      this.logger,
+    );
 
     const videoHttpController = new VideoHttpController(uploadVideoAction);
 
     this.httpServer = new HttpServer([applicationHttpController, videoHttpController], this.logger, this.config);
 
-    this.amqpProvisioner = new AmqpProvisioner(this.logger);
-  }
-
-  public async start(): Promise<void> {
     await this.httpServer.start();
-
-    await this.setupAmqp();
   }
 
   public async stop(): Promise<void> {
-    await this.httpServer.stop();
+    await this.httpServer?.stop();
 
     await this.amqpConnection?.close();
   }
@@ -58,12 +65,12 @@ export class Application {
       url: this.config.amqp.url,
     });
 
-    const channel = await this.amqpProvisioner.createChannel({
+    this.amqpChannel = await this.amqpProvisioner.createChannel({
       connection: this.amqpConnection,
     });
 
     await this.amqpProvisioner.createQueue({
-      channel,
+      channel: this.amqpChannel,
       exchangeName,
       queueName: queueNames.ingestedVideos,
       pattern: routingKeys.videoIngested,

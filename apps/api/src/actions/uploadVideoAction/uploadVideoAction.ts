@@ -5,6 +5,8 @@ import { type S3Service } from '@common/s3';
 
 import { type UuidService } from '../../common/uuid/uuidService.js';
 import { type Config } from '../../config.js';
+import { type Channel } from 'amqplib';
+import { exchangeName, routingKeys } from '@common/contracts';
 
 export interface UploadVideoActionPayload {
   readonly data: Readable;
@@ -18,6 +20,7 @@ export interface UploadVideoActionResult {
 
 export class UploadVideoAction {
   public constructor(
+    private readonly channel: Channel,
     private readonly s3Service: S3Service,
     private readonly uuidService: UuidService,
     private readonly config: Config,
@@ -51,7 +54,11 @@ export class UploadVideoAction {
       contentType,
     });
 
-    // TODO: send rabbitmq message
+    this.channel.publish(
+      exchangeName,
+      routingKeys.videoIngested,
+      Buffer.from(JSON.stringify({ blobId, notificationEmail })),
+    );
 
     return { traceId: blobId };
   }
