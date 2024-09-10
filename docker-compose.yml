@@ -1,5 +1,6 @@
 services:
   transcoder-localstack:
+    container_name: 'transcoder-localstack'
     image: localstack/localstack
     ports:
       - '4566:4566'
@@ -14,3 +15,28 @@ services:
       DATA_DIR: /tmp/localstack/data
     volumes:
       - '/var/run/docker.sock:/var/run/docker.sock'
+
+  transcoder-rabbitmq:
+    container_name: 'transcoder-rabbitmq'
+    image: rabbitmq:3.9.7-management-alpine
+    environment:
+      - RABBITMQ_DEFAULT_USER=test
+      - RABBITMQ_DEFAULT_PASS=test
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    networks:
+      - transcoder-network
+
+  transcoder-redis:
+    container_name: transcoder-redis
+    image: 'bitnami/redis:latest'
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    ports:
+      - '6379:6379'
+
+networks:
+  transcoder-network:
+    name: transcoder-network
+    driver: bridge
