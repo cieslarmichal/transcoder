@@ -20,6 +20,7 @@
     "build:dev": "tsc --build tsconfig.dev.json"
   },
   "dependencies": {
-    "@common/logger": "*"
+    "@common/logger": "*",
+    "amqplib": "0.10.4"
   }
 }
