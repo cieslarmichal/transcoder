@@ -10,7 +10,6 @@
   },
   "dependencies": {
     "@sinclair/typebox": "0.32.35",
-    "amqplib": "0.10.4",
     "config": "3.3.12"
   },
   "devDependencies": {

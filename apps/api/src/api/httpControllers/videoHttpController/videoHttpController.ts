@@ -10,9 +10,15 @@ import { type UploadVideoAction } from '../../../actions/uploadVideoAction/uploa
 import { type HttpController } from '../../../common/types/http/httpController.js';
 import { HttpMethodName } from '../../../common/types/http/httpMethodName.js';
 import { type HttpRequest } from '../../../common/types/http/httpRequest.js';
-import { type HttpCreatedResponse } from '../../../common/types/http/httpResponse.js';
+import { type HttpOkResponse, type HttpCreatedResponse } from '../../../common/types/http/httpResponse.js';
 import { HttpRoute } from '../../../common/types/http/httpRoute.js';
 import { HttpStatusCode } from '../../../common/types/http/httpStatusCode.js';
+import {
+  type GetVideoEncodingProgressPathParamsDto,
+  getVideoEncodingProgressPathParamsDtoSchema,
+  type GetVideoEncodingProgressResponseBodyDto,
+  getVideoEncodingProgressResponseBodyDtoSchema,
+} from './schemas/getVideoEncodingProgressSchema.js';
 
 export class VideoHttpController implements HttpController {
   public readonly basePath = '/videos';
@@ -38,6 +44,23 @@ export class VideoHttpController implements HttpController {
         },
         description: 'Upload video',
       }),
+      new HttpRoute({
+        method: HttpMethodName.get,
+        path: '/:videoId/progress',
+        handler: this.getVideoEncodingProgress.bind(this),
+        schema: {
+          request: {
+            pathParams: getVideoEncodingProgressPathParamsDtoSchema,
+          },
+          response: {
+            [HttpStatusCode.ok]: {
+              schema: getVideoEncodingProgressResponseBodyDtoSchema,
+              description: 'Video encoding progress fetched',
+            },
+          },
+        },
+        description: 'Fetch video encoding progress',
+      }),
     ];
   }
 
@@ -61,6 +84,28 @@ export class VideoHttpController implements HttpController {
     return {
       statusCode: HttpStatusCode.created,
       body: { videoId },
+    };
+  }
+
+  private async getVideoEncodingProgress(
+    request: HttpRequest<undefined, undefined, GetVideoEncodingProgressPathParamsDto>,
+  ): Promise<HttpOkResponse<GetVideoEncodingProgressResponseBodyDto>> {
+    const { videoId } = request.pathParams;
+
+    return {
+      statusCode: HttpStatusCode.ok,
+      body: {
+        data: [
+          {
+            profile: '1080p',
+            progress: 0.5,
+          },
+          {
+            profile: '720p',
+            progress: 0.3,
+          },
+        ],
+      },
     };
   }
 }
