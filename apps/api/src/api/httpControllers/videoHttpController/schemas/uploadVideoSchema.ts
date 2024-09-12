@@ -10,7 +10,7 @@ export const uploadVideoQueryParamsDtoSchema = Type.Object({
 export type UploadVideoQueryParamsDto = Static<typeof uploadVideoQueryParamsDtoSchema>;
 
 export const uploadVideoResponseBodyDtoSchema = Type.Object({
-  traceId: Type.String({ format: 'uuid' }),
+  videoId: Type.String({ format: 'uuid' }),
 });
 
 export type UploadVideoResponseBodyDto = Static<typeof uploadVideoResponseBodyDtoSchema>;

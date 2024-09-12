@@ -4,18 +4,17 @@ import { type Logger } from '@common/logger';
 import { type S3Service } from '@common/s3';
 
 import { type UuidService } from '../../common/uuid/uuidService.js';
-import { type Config } from '../../config.js';
 import { type Channel } from 'amqplib';
-import { exchangeName, routingKeys } from '@common/contracts';
+import { bucketNames, exchangeName, routingKeys } from '@common/contracts';
 
 export interface UploadVideoActionPayload {
   readonly data: Readable;
   readonly contentType: string;
-  readonly notificationEmail: string;
+  readonly userEmail: string;
 }
 
 export interface UploadVideoActionResult {
-  readonly traceId: string;
+  readonly videoId: string;
 }
 
 export class UploadVideoAction {
@@ -23,26 +22,23 @@ export class UploadVideoAction {
     private readonly channel: Channel,
     private readonly s3Service: S3Service,
     private readonly uuidService: UuidService,
-    private readonly config: Config,
     private readonly logger: Logger,
   ) {}
 
   public async execute(payload: UploadVideoActionPayload): Promise<UploadVideoActionResult> {
-    const { contentType, data, notificationEmail } = payload;
-
-    const { bucketName } = this.config.aws;
+    const { contentType, data, userEmail } = payload;
 
     this.logger.debug({
       message: 'Uploading video...',
-      bucketName,
+      bucketName: bucketNames.ingestedVideos,
       contentType,
-      notificationEmail,
+      userEmail,
     });
 
     const blobId = this.uuidService.generateUuid();
 
     await this.s3Service.uploadBlob({
-      bucketName,
+      bucketName: bucketNames.ingestedVideos,
       blobName: blobId,
       data,
       contentType,
@@ -50,16 +46,16 @@ export class UploadVideoAction {
 
     this.logger.debug({
       message: 'Video uploaded.',
-      bucketName,
+      bucketName: bucketNames.ingestedVideos,
       contentType,
     });
 
     this.channel.publish(
       exchangeName,
       routingKeys.videoIngested,
-      Buffer.from(JSON.stringify({ blobId, notificationEmail })),
+      Buffer.from(JSON.stringify({ videoId: blobId, userEmail })),
     );
 
-    return { traceId: blobId };
+    return { videoId: blobId };
   }
 }

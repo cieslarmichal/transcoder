@@ -22,7 +22,6 @@ const configSchema = Type.Object({
     secretAccessKey: Type.String({ minLength: 1 }),
     region: Type.Enum(AwsRegion),
     endpoint: Type.Optional(Type.String({ minLength: 1 })),
-    bucketName: Type.String({ minLength: 1 }),
   }),
   amqp: Type.Object({
     url: Type.String({ minLength: 1 }),

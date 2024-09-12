@@ -39,13 +39,7 @@ export class Application {
 
     const applicationHttpController = new ApplicationHttpController();
 
-    const uploadVideoAction = new UploadVideoAction(
-      this.amqpChannel as Channel,
-      s3Service,
-      uuidService,
-      this.config,
-      this.logger,
-    );
+    const uploadVideoAction = new UploadVideoAction(this.amqpChannel as Channel, s3Service, uuidService, this.logger);
 
     const videoHttpController = new VideoHttpController(uploadVideoAction);
 

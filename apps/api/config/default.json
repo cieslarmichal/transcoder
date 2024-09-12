@@ -8,8 +8,7 @@
   "aws": {
     "accessKeyId": null,
     "secretAccessKey": null,
-    "region": "eu-central-1",
-    "bucketName": "transcoder-artifacts"
+    "region": "eu-central-1"
   },
   "amqp": {
     "url": "amqp://test:test@localhost:5672",
