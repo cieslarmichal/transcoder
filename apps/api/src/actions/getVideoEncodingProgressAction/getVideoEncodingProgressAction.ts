@@ -1,43 +1,49 @@
-import { type Readable } from 'node:stream';
-
+import { ResourceNotFoundError } from '@common/errors';
 import { type Logger } from '@common/logger';
+import { type RedisClient } from '@common/redis';
 
-export interface UploadVideoActionPayload {
-  readonly data: Readable;
-  readonly contentType: string;
-  readonly userEmail: string;
-}
-
-export interface UploadVideoActionResult {
+export interface GetVideoEncodingProgressActionPayload {
   readonly videoId: string;
 }
 
-export class UploadVideoAction {
-  public constructor(private readonly logger: Logger) {}
+export interface GetVideoEncodingProgressActionResult {
+  readonly encodingProgress: { profile: string; progress: string }[];
+}
 
-  public async execute(payload: UploadVideoActionPayload): Promise<UploadVideoActionResult> {
-    const { contentType, data, userEmail } = payload;
+export class GetVideoEncodingProgressAction {
+  public constructor(
+    private readonly redisClient: RedisClient,
+    private readonly logger: Logger,
+  ) {}
+
+  public async execute(payload: GetVideoEncodingProgressActionPayload): Promise<GetVideoEncodingProgressActionResult> {
+    const { videoId } = payload;
 
     this.logger.debug({
       message: 'Fetching video encoding progress...',
-      contentType,
-      userEmail,
+      videoId,
     });
 
-    const progress = await this.redisClient.hGetAll(videoId);
+    const encodingProgress = await this.redisClient.hgetall(videoId);
 
-    if (!progress) {
-      throw new Error(`No encoding progress found for videoId: ${videoId}`);
+    if (!encodingProgress) {
+      throw new ResourceNotFoundError({
+        resource: 'Video',
+        id: videoId,
+      });
     }
 
-    return progress as { profile: string; progress: string };
-
     this.logger.debug({
-      message: 'Video uploaded.',
-      bucketName: bucketNames.ingestedVideos,
-      contentType,
+      message: 'Video encoding progress fetched.',
+      videoId,
+      progress: encodingProgress,
     });
 
-    return { videoId: blobId };
+    const flatEncodingProgress = Object.entries(encodingProgress).map(([profile, progress]) => ({
+      profile,
+      progress,
+    }));
+
+    return { encodingProgress: flatEncodingProgress };
   }
 }

@@ -10,7 +10,7 @@ export const getVideoEncodingProgressResponseBodyDtoSchema = Type.Object({
   data: Type.Array(
     Type.Object({
       profile: Type.String(),
-      progress: Type.Number(),
+      progress: Type.String(),
     }),
   ),
 });

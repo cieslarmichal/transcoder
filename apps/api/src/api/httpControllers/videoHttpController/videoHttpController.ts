@@ -19,12 +19,16 @@ import {
   type GetVideoEncodingProgressResponseBodyDto,
   getVideoEncodingProgressResponseBodyDtoSchema,
 } from './schemas/getVideoEncodingProgressSchema.js';
+import { type GetVideoEncodingProgressAction } from '../../../actions/getVideoEncodingProgressAction/getVideoEncodingProgressAction.js';
 
 export class VideoHttpController implements HttpController {
   public readonly basePath = '/videos';
   public readonly tags = ['Video'];
 
-  public constructor(private readonly uploadFileAction: UploadVideoAction) {}
+  public constructor(
+    private readonly uploadFileAction: UploadVideoAction,
+    private readonly getVideoEncodingProgressAction: GetVideoEncodingProgressAction,
+  ) {}
 
   public getHttpRoutes(): HttpRoute[] {
     return [
@@ -92,20 +96,11 @@ export class VideoHttpController implements HttpController {
   ): Promise<HttpOkResponse<GetVideoEncodingProgressResponseBodyDto>> {
     const { videoId } = request.pathParams;
 
+    const { encodingProgress } = await this.getVideoEncodingProgressAction.execute({ videoId });
+
     return {
       statusCode: HttpStatusCode.ok,
-      body: {
-        data: [
-          {
-            profile: '1080p',
-            progress: 0.5,
-          },
-          {
-            profile: '720p',
-            progress: 0.3,
-          },
-        ],
-      },
+      body: { data: encodingProgress },
     };
   }
 }

@@ -18,6 +18,7 @@
     "@common/contracts": "*",
     "@common/errors": "*",
     "@common/logger": "*",
+    "@common/redis": "*",
     "@common/s3": "*",
     "@fastify/cors": "9.0.1",
     "@fastify/helmet": "11.1.1",
@@ -28,8 +29,7 @@
     "fastify": "4.28.1"
   },
   "devDependencies": {
-    "@faker-js/faker": "9.0.0",
-    "@types/uuid": "10.0.0"
+    "@faker-js/faker": "9.0.0"
   },
   "volta": {
     "node": "20.17.0",

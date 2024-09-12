@@ -22,6 +22,9 @@
       "path": "../../common/logger/tsconfig.json"
     },
     {
+      "path": "../../common/redis/tsconfig.json"
+    }
+    {
       "path": "../../common/s3/tsconfig.json"
     }
   ]
