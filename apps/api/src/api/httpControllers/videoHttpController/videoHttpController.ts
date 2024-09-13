@@ -20,6 +20,13 @@ import {
   getVideoEncodingProgressResponseBodyDtoSchema,
 } from './schemas/getVideoEncodingProgressSchema.js';
 import { type GetVideoEncodingProgressAction } from '../../../actions/getVideoEncodingProgressAction/getVideoEncodingProgressAction.js';
+import { type GetVideoEncodingArtifactsAction } from '../../../actions/getVideoEncodingArtifactsAction/getVideoEncodingArtifactsAction.js';
+import {
+  getVideoEncodingArtifactsPathParamsDtoSchema,
+  getVideoEncodingArtifactsResponseBodyDtoSchema,
+  type GetVideoEncodingArtifactsPathParamsDto,
+  type GetVideoEncodingArtifactsResponseBodyDto,
+} from './schemas/getVideoEncodingArtifactsSchema.js';
 
 export class VideoHttpController implements HttpController {
   public readonly basePath = '/videos';
@@ -28,6 +35,7 @@ export class VideoHttpController implements HttpController {
   public constructor(
     private readonly uploadFileAction: UploadVideoAction,
     private readonly getVideoEncodingProgressAction: GetVideoEncodingProgressAction,
+    private readonly getVideoEncodingArtifactsAction: GetVideoEncodingArtifactsAction,
   ) {}
 
   public getHttpRoutes(): HttpRoute[] {
@@ -65,6 +73,23 @@ export class VideoHttpController implements HttpController {
         },
         description: 'Fetch video encoding progress',
       }),
+      new HttpRoute({
+        method: HttpMethodName.get,
+        path: '/:videoId/artifacts',
+        handler: this.getVideoEncodingArtifacts.bind(this),
+        schema: {
+          request: {
+            pathParams: getVideoEncodingArtifactsPathParamsDtoSchema,
+          },
+          response: {
+            [HttpStatusCode.ok]: {
+              schema: getVideoEncodingArtifactsResponseBodyDtoSchema,
+              description: 'Video encoding artifacts fetched',
+            },
+          },
+        },
+        description: 'Fetch video encoding artifacts',
+      }),
     ];
   }
 
@@ -101,6 +126,19 @@ export class VideoHttpController implements HttpController {
     return {
       statusCode: HttpStatusCode.ok,
       body: { data: encodingProgress },
+    };
+  }
+
+  private async getVideoEncodingArtifacts(
+    request: HttpRequest<undefined, undefined, GetVideoEncodingArtifactsPathParamsDto>,
+  ): Promise<HttpOkResponse<GetVideoEncodingArtifactsResponseBodyDto>> {
+    const { videoId } = request.pathParams;
+
+    const { encodingArtifacts } = await this.getVideoEncodingArtifactsAction.execute({ videoId });
+
+    return {
+      statusCode: HttpStatusCode.ok,
+      body: { data: encodingArtifacts },
     };
   }
 }
