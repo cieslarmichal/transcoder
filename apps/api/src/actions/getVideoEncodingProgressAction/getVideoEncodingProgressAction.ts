@@ -7,7 +7,7 @@ export interface GetVideoEncodingProgressActionPayload {
 }
 
 export interface GetVideoEncodingProgressActionResult {
-  readonly encodingProgress: { profile: string; progress: string }[];
+  readonly encodingProgress: { id: string; progress: string }[];
 }
 
 export class GetVideoEncodingProgressAction {
@@ -39,8 +39,8 @@ export class GetVideoEncodingProgressAction {
       progress: encodingProgress,
     });
 
-    const flatEncodingProgress = Object.entries(encodingProgress).map(([profile, progress]) => ({
-      profile,
+    const flatEncodingProgress = Object.entries(encodingProgress).map(([id, progress]) => ({
+      id,
       progress,
     }));
 

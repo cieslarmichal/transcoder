@@ -4,10 +4,11 @@
     "outDir": "./dist",
   },
   "include": ["src/**/*.ts"],
+  "exclude": [
+    "src/**/tests/**/*",
+    "src/**/*.test.ts"
+  ],
   "references": [
-    {
-      "path": "../../common/amqp/tsconfig.json"
-    },
     {
       "path": "../../common/contracts/tsconfig.json"
     },
@@ -16,9 +17,6 @@
     },
     {
       "path": "../../common/logger/tsconfig.json"
-    },
-    {
-      "path": "../../common/redis/tsconfig.json"
     },
     {
       "path": "../../common/s3/tsconfig.json"

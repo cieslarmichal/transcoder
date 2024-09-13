@@ -15,6 +15,8 @@ export class RedisClientFactory {
     const client = new Redis({
       host: config.host,
       port: config.port,
+      lazyConnect: true,
+      maxRetriesPerRequest: 3,
     });
 
     client.on('connect', () => {

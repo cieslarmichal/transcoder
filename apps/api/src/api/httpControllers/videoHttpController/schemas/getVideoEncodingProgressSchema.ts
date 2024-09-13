@@ -9,7 +9,7 @@ export type GetVideoEncodingProgressPathParamsDto = Static<typeof getVideoEncodi
 export const getVideoEncodingProgressResponseBodyDtoSchema = Type.Object({
   data: Type.Array(
     Type.Object({
-      profile: Type.String(),
+      id: Type.String(),
       progress: Type.String(),
     }),
   ),

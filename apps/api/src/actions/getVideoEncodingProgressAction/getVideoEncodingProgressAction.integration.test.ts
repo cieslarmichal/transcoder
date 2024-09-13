@@ -1,44 +1,22 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import { faker } from '@faker-js/faker';
-import { randomUUID } from 'node:crypto';
-import { createReadStream } from 'node:fs';
-import path from 'path';
 import { expect, describe, it, beforeEach, afterEach } from 'vitest';
 
 import { LoggerFactory } from '@common/logger';
-import { S3ClientFactory, S3Service } from '@common/s3';
-import { S3TestUtils } from '@common/s3/tests';
 
-import { UploadVideoAction } from './getVideoEncodingProgressAction.js';
-import { type UuidService } from '../../common/uuid/uuidService.js';
 import { ConfigFactory, type Config } from '../../config.js';
-import { type GetMessage, type Channel, type Connection } from 'amqplib';
-import { AmqpProvisioner } from '@common/amqp';
-import { exchangeName, queueNames, routingKeys, bucketNames } from '@common/contracts';
+import { GetVideoEncodingProgressAction } from './getVideoEncodingProgressAction.js';
+import { RedisClientFactory, type RedisClient } from '@common/redis';
+import { ResourceNotFoundError } from '@common/errors';
 
 describe('GetVideoEncodingProgressAction', () => {
-  let action: UploadVideoAction;
-
-  let s3TestUtils: S3TestUtils;
+  let action: GetVideoEncodingProgressAction;
 
   let config: Config;
 
-  let amqpConnection: Connection;
-
-  let amqpChannel: Channel;
-
-  const resourcesDirectory = path.resolve(__dirname, '../../../../../resources');
-
-  const sampleFileName = 'sample_video1.mp4';
-
-  const filePath = path.join(resourcesDirectory, sampleFileName);
-
-  const videoId = randomUUID();
+  let redisClient: RedisClient;
 
   beforeEach(async () => {
-    const uuidService = {
-      generateUuid: (): string => videoId,
-    } satisfies UuidService;
-
     config = ConfigFactory.create();
 
     const logger = LoggerFactory.create({
@@ -46,56 +24,52 @@ describe('GetVideoEncodingProgressAction', () => {
       logLevel: config.logLevel,
     });
 
-    await amqpProvisioner.createQueue({
-      channel: amqpChannel,
-      exchangeName,
-      queueName: queueNames.ingestedVideos,
-      pattern: routingKeys.videoIngested,
-      dlqMessageTtl: config.amqp.messageTtl,
-    });
+    redisClient = new RedisClientFactory(logger).create(config.redis);
 
-    const s3Client = S3ClientFactory.create(config.aws);
+    action = new GetVideoEncodingProgressAction(redisClient, logger);
 
-    const s3Service = new S3Service(s3Client);
-
-    s3TestUtils = new S3TestUtils(s3Client);
-
-    action = new UploadVideoAction(amqpChannel, s3Service, uuidService, logger);
-
-    await s3TestUtils.createBucket(bucketNames.ingestedVideos);
+    await redisClient.ping();
   });
 
   afterEach(async () => {
-    await s3TestUtils.deleteBucket(bucketNames.ingestedVideos);
+    await redisClient.flushall();
 
-    await amqpConnection.close();
+    await redisClient.quit();
   });
 
-  it('uploads a video', async () => {
-    const userEmail = faker.internet.email();
+  it('gets video encoding progress', async () => {
+    const videoId = faker.string.uuid();
 
-    const existsBefore = await s3TestUtils.objectExists(bucketNames.ingestedVideos, videoId);
-
-    expect(existsBefore).toBe(false);
-
-    const { videoId: actualVideoId } = await action.execute({
-      data: createReadStream(filePath),
-      contentType: 'video/mp4',
-      userEmail,
+    await redisClient.hset(videoId, {
+      '1080p': '75%',
+      '720p': '55%',
+      '480p': '30%',
+      '360p': '10%',
+      preview: '0%',
+      preview_360p: '1%',
+      preview_1080p: '3%',
     });
 
-    const existsAfter = await s3TestUtils.objectExists(bucketNames.ingestedVideos, videoId);
+    const { encodingProgress } = await action.execute({ videoId });
 
-    expect(existsAfter).toBe(true);
+    expect(encodingProgress).toEqual([
+      { id: '1080p', progress: '75%' },
+      { id: '720p', progress: '55%' },
+      { id: '480p', progress: '30%' },
+      { id: '360p', progress: '10%' },
+      { id: 'preview', progress: '0%' },
+      { id: 'preview_360p', progress: '1%' },
+      { id: 'preview_1080p', progress: '3%' },
+    ]);
+  });
 
-    expect(actualVideoId).toEqual(videoId);
+  it('throws error if video encoding progress not found', async () => {
+    const videoId = faker.string.uuid();
 
-    const message = (await amqpChannel.get(queueNames.ingestedVideos)) as GetMessage;
-
-    expect(message).not.toBe(false);
-
-    const parsedMessage = JSON.parse(message.content.toString());
-
-    expect(parsedMessage).toEqual({ videoId, userEmail });
+    try {
+      await action.execute({ videoId });
+    } catch (error) {
+      expect(error).toBeInstanceOf(ResourceNotFoundError);
+    }
   });
 });

@@ -6,5 +6,8 @@
   },
   "amqp": {
     "url": "AMQP_URL"
+  },
+  "redis": {
+    "host": "REDIS_HOST"
   }
 }

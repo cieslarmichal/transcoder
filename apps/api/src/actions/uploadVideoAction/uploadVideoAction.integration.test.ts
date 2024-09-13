@@ -106,6 +106,10 @@ describe('UploadVideoAction', () => {
 
     const parsedMessage = JSON.parse(message.content.toString());
 
-    expect(parsedMessage).toEqual({ videoId, userEmail });
+    expect(parsedMessage).toEqual({
+      videoId,
+      userEmail,
+      url: `http://transcoder-ingested-videos.s3.localhost.localstack.cloud:4566/${videoId}`,
+    });
   });
 });

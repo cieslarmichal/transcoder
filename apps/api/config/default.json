@@ -14,5 +14,9 @@
     "url": "amqp://test:test@localhost:5672",
     "redeliveryDropThreshold": 5,
     "messageTtl": 60000
+  },
+  "redis": {
+    "host": "localhost",
+    "port": 6379
   }
 }

@@ -10,6 +10,8 @@ import { type Config, ConfigFactory } from './config.js';
 import { HttpServer } from './httpServer.js';
 import { type Channel, type Connection } from 'amqplib';
 import { exchangeName, queueNames, routingKeys } from '@common/contracts';
+import { RedisClientFactory, type RedisClient } from '@common/redis';
+import { GetVideoEncodingProgressAction } from './actions/getVideoEncodingProgressAction/getVideoEncodingProgressAction.js';
 
 export class Application {
   private readonly config: Config;
@@ -18,6 +20,7 @@ export class Application {
   private amqpConnection: Connection | undefined;
   private amqpChannel: Channel | undefined;
   private readonly amqpProvisioner: AmqpProvisioner;
+  private readonly redisClient: RedisClient;
 
   public constructor() {
     this.config = ConfigFactory.create();
@@ -28,6 +31,8 @@ export class Application {
     });
 
     this.amqpProvisioner = new AmqpProvisioner(this.logger);
+
+    this.redisClient = new RedisClientFactory(this.logger).create(this.config.redis);
   }
 
   public async start(): Promise<void> {
@@ -41,17 +46,23 @@ export class Application {
 
     const uploadVideoAction = new UploadVideoAction(this.amqpChannel as Channel, s3Service, uuidService, this.logger);
 
-    const videoHttpController = new VideoHttpController(uploadVideoAction);
+    const getVideoEncodingProgressAction = new GetVideoEncodingProgressAction(this.redisClient, this.logger);
+
+    const videoHttpController = new VideoHttpController(uploadVideoAction, getVideoEncodingProgressAction);
 
     this.httpServer = new HttpServer([applicationHttpController, videoHttpController], this.logger, this.config);
 
     await this.httpServer.start();
+
+    await this.redisClient.ping();
   }
 
   public async stop(): Promise<void> {
     await this.httpServer?.stop();
 
     await this.amqpConnection?.close();
+
+    await this.redisClient.quit();
   }
 
   private async setupAmqp(): Promise<void> {
