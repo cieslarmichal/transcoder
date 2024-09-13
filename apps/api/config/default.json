@@ -11,12 +11,12 @@
     "region": "eu-central-1"
   },
   "amqp": {
-    "url": "amqp://test:test@localhost:5672",
+    "url": "amqp://test:test@transcoder-rabbitmq:5672",
     "redeliveryDropThreshold": 5,
     "messageTtl": 60000
   },
   "redis": {
-    "host": "localhost",
+    "host": "transcoder-redis",
     "port": 6379
   }
 }

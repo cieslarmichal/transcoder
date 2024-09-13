@@ -31,7 +31,6 @@ RUN npm run build --filter="@apps/api"
 
 FROM base AS runner
 
-ENV NODE_ENV=production
 ENV NODE_CONFIG_DIR=/app/apps/api/config
 
 COPY package*.json ./
