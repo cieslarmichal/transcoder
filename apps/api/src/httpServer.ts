@@ -39,7 +39,11 @@ export class HttpServer {
 
     await this.initSwagger();
 
-    await this.fastifyServer.register(fastifyMultipart);
+    await this.fastifyServer.register(fastifyMultipart, {
+      limits: {
+        fileSize: 1024 * 1024 * 1024 * 4,
+      },
+    });
 
     await this.fastifyServer.register(fastifyHelmet);
 

@@ -1,21 +1,4 @@
 services:
-  transcoder-localstack:
-    container_name: transcoder-localstack
-    image: localstack/localstack
-    ports:
-      - '4566:4566'
-    environment:
-      SERVICES: s3
-      AWS_DEFAULT_REGION: eu-central-1
-      AWS_ACCESS_KEY_ID: test
-      AWS_SECRET_ACCESS_KEY: test
-      AWS_ENDPOINT: http://127.0.0.1:4566
-      DEBUG: 1
-      DOCKER_HOST: unix:///var/run/docker.sock
-      DATA_DIR: /tmp/localstack/data
-    volumes:
-      - '/var/run/docker.sock:/var/run/docker.sock'
-
   transcoder-rabbitmq:
     container_name: transcoder-rabbitmq
     image: rabbitmq:3.9.7-management-alpine
@@ -39,17 +22,17 @@ services:
     ports:
       - '6379:6379'
 
-  # transcoder-api:
-  #   container_name: transcoder-api
-  #   build:
-  #     context: .
-  #     dockerfile: ./apps/api/Dockerfile
-  #   environment:
-  #     - NODE_ENV=development
-  #   ports:
-  #     - '5000:5000'
-  #   depends_on:
-  #     transcoder-redis:
-  #       condition: service_started
-  #     transcoder-rabbitmq:
-  #       condition: service_healthy
+  transcoder-api:
+    container_name: transcoder-api
+    build:
+      context: .
+      dockerfile: ./apps/api/Dockerfile
+    environment:
+      - NODE_ENV=development
+    ports:
+      - '5000:5000'
+    depends_on:
+      transcoder-redis:
+        condition: service_started
+      transcoder-rabbitmq:
+        condition: service_healthy

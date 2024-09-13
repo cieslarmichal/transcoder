@@ -27,6 +27,7 @@ import {
   type GetVideoEncodingArtifactsPathParamsDto,
   type GetVideoEncodingArtifactsResponseBodyDto,
 } from './schemas/getVideoEncodingArtifactsSchema.js';
+import { createReadStream } from 'node:fs';
 
 export class VideoHttpController implements HttpController {
   public readonly basePath = '/videos';
@@ -98,16 +99,26 @@ export class VideoHttpController implements HttpController {
   ): Promise<HttpCreatedResponse<UploadVideoResponseBodyDto>> {
     const { notificationEmail } = request.queryParams;
 
-    if (!request.file) {
+    const requestFile = request.files?.[0];
+
+    if (!requestFile) {
       throw new OperationNotValidError({
-        reason: 'No file attached',
+        reason: 'No file attached.',
       });
     }
 
+    if (request.files.length > 1) {
+      throw new OperationNotValidError({
+        reason: 'Multiple files attached. Only one file is allowed.',
+      });
+    }
+
+    const { name: fileName, filePath } = requestFile;
+
     const { videoId } = await this.uploadFileAction.execute({
       userEmail: notificationEmail,
-      fileName: request.file.name,
-      data: request.file.data,
+      fileName,
+      data: createReadStream(filePath),
     });
 
     return {

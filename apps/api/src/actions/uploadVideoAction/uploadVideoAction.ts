@@ -87,6 +87,7 @@ export class UploadVideoAction {
     await this.s3Service.uploadBlob({
       bucketName: bucketNames.ingestedVideos,
       blobName,
+      sourceName: fileName,
       data,
       contentType: videoContentType,
     });

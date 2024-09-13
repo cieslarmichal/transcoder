@@ -1,6 +1,6 @@
 services:
-  transcoder-localstack:
-    container_name: transcoder-localstack
+  transcoder-localstack-test:
+    container_name: transcoder-localstack-test
     image: localstack/localstack
     ports:
       - '4566:4566'
@@ -16,8 +16,8 @@ services:
     volumes:
       - '/var/run/docker.sock:/var/run/docker.sock'
 
-  transcoder-rabbitmq:
-    container_name: transcoder-rabbitmq
+  transcoder-rabbitmq-test:
+    container_name: transcoder-rabbitmq-test
     image: rabbitmq:3.9.7-management-alpine
     environment:
       RABBITMQ_DEFAULT_USER: test
@@ -31,8 +31,8 @@ services:
       timeout: 30s
       retries: 5
 
-  transcoder-redis:
-    container_name: transcoder-redis
+  transcoder-redis-test:
+    container_name: transcoder-redis-test
     image: 'bitnami/redis:latest'
     environment:
       - ALLOW_EMPTY_PASSWORD=yes

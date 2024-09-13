@@ -7,6 +7,11 @@ import { HttpHeader } from './common/types/http/httpHeader.js';
 import { HttpMediaType } from './common/types/http/httpMediaType.js';
 import { type AttachedFile } from './common/types/http/httpRequest.js';
 import { type HttpRouteSchema, type HttpRoute } from './common/types/http/httpRoute.js';
+import { createWriteStream } from 'node:fs';
+import { promisify } from 'node:util';
+import { pipeline } from 'node:stream';
+
+const streamPipeline = promisify(pipeline);
 
 export interface RegisterControllersPayload {
   readonly controllers: HttpController[];
@@ -52,17 +57,26 @@ export class HttpRouter {
       const path = this.normalizePath({ path: `/${this.rootPath}/${basePath}/${controllerPath}` });
 
       const handler = async (fastifyRequest: FastifyRequest, fastifyReply: FastifyReply): Promise<void> => {
-        let attachedFile: AttachedFile | undefined;
+        let attachedFiles: AttachedFile[] | undefined;
 
         if (fastifyRequest.isMultipart()) {
-          const file = await fastifyRequest.file();
+          attachedFiles = [];
 
-          if (file) {
-            attachedFile = {
-              name: file.filename,
-              type: file.mimetype,
-              data: file.file,
-            };
+          const files = fastifyRequest.files();
+
+          for await (const file of files) {
+            const { filename, file: data } = file;
+
+            const filePath = `/tmp/${filename}`;
+
+            const writer = createWriteStream(filePath);
+
+            await streamPipeline(data, writer);
+
+            attachedFiles.push({
+              name: filename,
+              filePath,
+            });
           }
         }
 
@@ -71,7 +85,7 @@ export class HttpRouter {
           pathParams: fastifyRequest.params,
           queryParams: fastifyRequest.query,
           headers: fastifyRequest.headers as Record<string, string>,
-          file: attachedFile,
+          files: attachedFiles,
         });
 
         fastifyReply.status(statusCode);

@@ -15,13 +15,10 @@ import { OperationNotValidError } from '@common/errors';
 
 export interface UploadBlobPayload {
   readonly blobName: string;
+  readonly sourceName?: string;
   readonly bucketName: string;
   readonly data: Readable;
   readonly contentType: string;
-}
-
-export interface UploadBlobResult {
-  readonly location: string;
 }
 
 export interface GetBlobUrlPayload {
@@ -51,8 +48,10 @@ export interface GetBlobNamesPayload {
 export class S3Service {
   public constructor(private readonly s3Client: S3Client) {}
 
-  public async uploadBlob(payload: UploadBlobPayload): Promise<UploadBlobResult> {
-    const { bucketName, blobName, data, contentType } = payload;
+  public async uploadBlob(payload: UploadBlobPayload): Promise<void> {
+    const { bucketName, blobName, data, contentType, sourceName } = payload;
+
+    const attachmentFileName = sourceName ? sourceName : blobName;
 
     const upload = new Upload({
       client: this.s3Client,
@@ -61,13 +60,11 @@ export class S3Service {
         Key: blobName,
         Body: data,
         ContentType: contentType,
-        ContentDisposition: `attachment; filename=${blobName}`,
+        ContentDisposition: `attachment; filename=${attachmentFileName}`,
       },
     });
 
-    const result = await upload.done();
-
-    return { location: result.Location as string };
+    await upload.done();
   }
 
   public async getBlobUrl(payload: GetBlobUrlPayload): Promise<string> {
