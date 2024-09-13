@@ -4,7 +4,7 @@ import { type Logger } from '@common/logger';
 import { type S3Service } from '@common/s3';
 
 import { type UuidService } from '../../common/uuid/uuidService.js';
-import { bucketNames, exchangeName, routingKeys } from '@common/contracts';
+import { bucketNames, exchangeName, routingKeys, type VideoIngestedMessage } from '@common/contracts';
 import { type Channel } from 'amqplib';
 
 export interface UploadVideoActionPayload {
@@ -14,7 +14,8 @@ export interface UploadVideoActionPayload {
 }
 
 export interface UploadVideoActionResult {
-  readonly videoId: string;
+  readonly id: string;
+  readonly url: string;
 }
 
 export class UploadVideoAction {
@@ -37,7 +38,7 @@ export class UploadVideoAction {
 
     const videoId = this.uuidService.generateUuid();
 
-    const { location: url } = await this.s3Service.uploadBlob({
+    const { location: videoUrl } = await this.s3Service.uploadBlob({
       bucketName: bucketNames.ingestedVideos,
       blobName: videoId,
       data,
@@ -46,15 +47,20 @@ export class UploadVideoAction {
 
     this.logger.debug({
       message: 'Video uploaded.',
-      url,
+      videoUrl,
     });
 
-    this.channel.publish(
-      exchangeName,
-      routingKeys.videoIngested,
-      Buffer.from(JSON.stringify({ videoId, url, userEmail })),
-    );
+    const message = {
+      videoId,
+      videoUrl,
+      userEmail,
+    } satisfies VideoIngestedMessage;
 
-    return { videoId };
+    this.channel.publish(exchangeName, routingKeys.videoIngested, Buffer.from(JSON.stringify(message)));
+
+    return {
+      id: videoId,
+      url: videoUrl,
+    };
   }
 }

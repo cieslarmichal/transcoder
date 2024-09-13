@@ -12,6 +12,7 @@ import { type Channel, type Connection } from 'amqplib';
 import { exchangeName, queueNames, routingKeys } from '@common/contracts';
 import { RedisClientFactory, type RedisClient } from '@common/redis';
 import { GetVideoEncodingProgressAction } from './actions/getVideoEncodingProgressAction/getVideoEncodingProgressAction.js';
+import { GetVideoEncodingArtifactsAction } from './actions/getVideoEncodingArtifactsAction/getVideoEncodingArtifactsAction.js';
 
 export class Application {
   private readonly config: Config;
@@ -48,7 +49,13 @@ export class Application {
 
     const getVideoEncodingProgressAction = new GetVideoEncodingProgressAction(this.redisClient, this.logger);
 
-    const videoHttpController = new VideoHttpController(uploadVideoAction, getVideoEncodingProgressAction);
+    const getVideoEncodingArtifactsAction = new GetVideoEncodingArtifactsAction(s3Service, this.logger);
+
+    const videoHttpController = new VideoHttpController(
+      uploadVideoAction,
+      getVideoEncodingProgressAction,
+      getVideoEncodingArtifactsAction,
+    );
 
     this.httpServer = new HttpServer([applicationHttpController, videoHttpController], this.logger, this.config);
 

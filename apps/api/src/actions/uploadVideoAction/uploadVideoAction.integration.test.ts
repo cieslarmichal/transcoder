@@ -88,7 +88,7 @@ describe('UploadVideoAction', () => {
 
     expect(existsBefore).toBe(false);
 
-    const { videoId: actualVideoId } = await action.execute({
+    const { id, url } = await action.execute({
       data: createReadStream(filePath),
       contentType: 'video/mp4',
       userEmail,
@@ -98,7 +98,11 @@ describe('UploadVideoAction', () => {
 
     expect(existsAfter).toBe(true);
 
-    expect(actualVideoId).toEqual(videoId);
+    expect(id).toEqual(videoId);
+
+    const expectedVideoUrl = `http://${bucketNames.ingestedVideos}.s3.localhost.localstack.cloud:4566/${videoId}`;
+
+    expect(url).toEqual(expectedVideoUrl);
 
     const message = (await amqpChannel.get(queueNames.ingestedVideos)) as GetMessage;
 
@@ -108,8 +112,8 @@ describe('UploadVideoAction', () => {
 
     expect(parsedMessage).toEqual({
       videoId,
+      videoUrl: expectedVideoUrl,
       userEmail,
-      url: `http://${bucketNames.ingestedVideos}.s3.localhost.localstack.cloud:4566/${videoId}`,
     });
   });
 });
