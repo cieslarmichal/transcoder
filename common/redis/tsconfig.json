@@ -4,10 +4,6 @@
     "outDir": "./dist",
   },
   "include": ["src/**/*.ts"],
-  "exclude": [
-    "src/**/tests/**/*",
-    "src/**/*.test.ts"
-  ],
   "references": [
     {
       "path": "../../common/logger/tsconfig.json"

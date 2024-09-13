@@ -16,12 +16,21 @@
     "/dist"
   ],
   "scripts": {
-    "build": "tsc --build tsconfig.json",
-    "build:dev": "tsc --build tsconfig.dev.json"
+    "build": "tsc --build tsconfig.prod.json",
+    "build:dev": "tsc --build tsconfig.json"
   },
   "dependencies": {
-    "@common/errors": "*",
     "@aws-sdk/client-s3": "3.592.0",
-    "@aws-sdk/lib-storage": "3.592.0"
-  }
+    "@aws-sdk/lib-storage": "3.592.0",
+    "@aws-sdk/s3-request-presigner": "3.651.0",
+    "@common/errors": "*"
+  },
+  "volta": {
+    "node": "20.17.0",
+    "npm": "10.8.3"
+  },
+  "engines": {
+    "node": "20.17.0"
+  },
+  "packageManager": "npm@10.8.3"
 }

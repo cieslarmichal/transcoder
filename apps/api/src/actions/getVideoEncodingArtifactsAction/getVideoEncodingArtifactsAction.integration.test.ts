@@ -5,12 +5,12 @@ import { expect, describe, it, beforeEach, afterEach } from 'vitest';
 import { LoggerFactory } from '@common/logger';
 
 import { ConfigFactory, type Config } from '../../config.js';
-import { GetVideoEncodingProgressAction } from './getVideoEncodingProgressAction.js';
 import { RedisClientFactory, type RedisClient } from '@common/redis';
 import { ResourceNotFoundError } from '@common/errors';
+import { GetVideoEncodingArtifactsAction } from './getVideoEncodingArtifactsAction.js';
 
-describe('GetVideoEncodingProgressAction', () => {
-  let action: GetVideoEncodingProgressAction;
+describe('GetVideoEncodingArtifactsAction', () => {
+  let action: GetVideoEncodingArtifactsAction;
 
   let config: Config;
 
@@ -26,7 +26,7 @@ describe('GetVideoEncodingProgressAction', () => {
 
     redisClient = new RedisClientFactory(logger).create(config.redis);
 
-    action = new GetVideoEncodingProgressAction(redisClient, logger);
+    action = new GetVideoEncodingArtifactsAction(redisClient, logger);
 
     await redisClient.flushall();
   });
@@ -37,7 +37,7 @@ describe('GetVideoEncodingProgressAction', () => {
     await redisClient.quit();
   });
 
-  it('gets video encoding progress', async () => {
+  it('gets video encoding artifacts', async () => {
     const videoId = faker.string.uuid();
 
     const redisKey = `${videoId}-encoding-progress`;
@@ -46,15 +46,15 @@ describe('GetVideoEncodingProgressAction', () => {
       '1080p': '75%',
       '720p': '55%',
       '480p': '30%',
-      '360p': '10%',
-      preview: '0%',
-      preview_360p: '1%',
+      '360p': '100%',
+      preview: '100%',
+      preview_360p: '100%',
       preview_1080p: '3%',
     });
 
-    const { encodingProgress } = await action.execute({ videoId });
+    const { encodedArtifacts } = await action.execute({ videoId });
 
-    expect(encodingProgress).toEqual([
+    expect(encodingArtifacts).toEqual([
       { id: '1080p', progress: '75%' },
       { id: '720p', progress: '55%' },
       { id: '480p', progress: '30%' },
@@ -65,7 +65,7 @@ describe('GetVideoEncodingProgressAction', () => {
     ]);
   });
 
-  it('throws error if video encoding progress not found', async () => {
+  it('throws error if video artifacts not found', async () => {
     const videoId = faker.string.uuid();
 
     try {

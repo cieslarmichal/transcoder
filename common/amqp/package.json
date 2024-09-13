@@ -17,10 +17,18 @@
   ],
   "scripts": {
     "build": "tsc --build tsconfig.json",
-    "build:dev": "tsc --build tsconfig.dev.json"
+    "build:dev": "tsc --build tsconfig.json"
   },
   "dependencies": {
     "@common/logger": "*",
     "amqplib": "0.10.4"
-  }
+  },
+  "volta": {
+    "node": "20.17.0",
+    "npm": "10.8.3"
+  },
+  "engines": {
+    "node": "20.17.0"
+  },
+  "packageManager": "npm@10.8.3"
 }

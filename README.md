@@ -17,15 +17,18 @@ flowchart TB
 
   REDIS[Redis]:::db
 
-  USERS -->|video by http| API
+  USERS -->|send video| API
+  USERS -->|get progress| API
+  USERS -->|get artifacts| API
   API -->|video upload| S3
   API -->|done| RABBITMQ
+  API -->|get progress| REDIS
 
   RABBITMQ -->|url to download| DOWNLOADER
   DOWNLOADER -->|video download| S3
   DOWNLOADER -->|done| RABBITMQ
 
-  RABBITMQ -->|url with target format| ENCODER
+  RABBITMQ -->|url with encoding format| ENCODER
   ENCODER -->|save progress| REDIS
   ENCODER -->|done| RABBITMQ
 

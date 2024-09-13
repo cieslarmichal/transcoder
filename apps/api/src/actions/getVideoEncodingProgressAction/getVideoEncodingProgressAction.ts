@@ -24,11 +24,13 @@ export class GetVideoEncodingProgressAction {
       videoId,
     });
 
-    const encodingProgress = await this.redisClient.hgetall(videoId);
+    const redisKey = `${videoId}-encoding-progress`;
+
+    const encodingProgress = await this.redisClient.hgetall(redisKey);
 
     if (!encodingProgress) {
       throw new ResourceNotFoundError({
-        resource: 'Video',
+        resource: 'EncodingProgress',
         id: videoId,
       });
     }

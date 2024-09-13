@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/naming-convention */
 
 import { DeleteObjectCommand, ListObjectsV2Command, type S3Client } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
 import { type Readable } from 'node:stream';
-
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { OperationNotValidError } from '@common/errors';
 
 export interface UploadBlobPayload {
@@ -15,6 +16,11 @@ export interface UploadBlobPayload {
 
 export interface UploadBlobResult {
   readonly location: string;
+}
+
+export interface GetBlobUrlPayload {
+  readonly blobName: string;
+  readonly bucketName: string;
 }
 
 export interface BlobExistsPayload {
@@ -44,12 +50,26 @@ export class S3Service {
         Key: blobName,
         Body: data,
         ContentType: contentType,
+        ContentDisposition: `attachment; filename=${blobName}`,
       },
     });
 
     const result = await upload.done();
 
     return { location: result.Location as string };
+  }
+
+  public async getBlobUrl(payload: GetBlobUrlPayload): Promise<string> {
+    const { blobName, bucketName } = payload;
+
+    const command = new GetObjectCommand({
+      Bucket: bucketName,
+      Key: blobName,
+    });
+
+    const result = await this.s3Client.send(command);
+
+    return result.Body as string;
   }
 
   public async blobExists(payload: BlobExistsPayload): Promise<boolean> {
