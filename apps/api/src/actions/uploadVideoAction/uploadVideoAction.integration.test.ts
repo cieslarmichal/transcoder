@@ -14,6 +14,7 @@ import { ConfigFactory, type Config } from '../../config.js';
 import { type GetMessage, type Channel, type Connection } from 'amqplib';
 import { AmqpProvisioner } from '@common/amqp';
 import { exchangeName, queueNames, routingKeys, bucketNames } from '@common/contracts';
+import { OperationNotValidError } from '@common/errors';
 
 describe('UploadVideoAction', () => {
   let action: UploadVideoAction;
@@ -73,10 +74,14 @@ describe('UploadVideoAction', () => {
     action = new UploadVideoAction(amqpChannel, s3Service, uuidService, logger);
 
     await s3TestUtils.createBucket(bucketNames.ingestedVideos);
+
+    await amqpChannel.purgeQueue(queueNames.ingestedVideos);
   });
 
   afterEach(async () => {
     await s3TestUtils.deleteBucket(bucketNames.ingestedVideos);
+
+    await amqpChannel.purgeQueue(queueNames.ingestedVideos);
 
     await amqpConnection.close();
   });
@@ -84,25 +89,23 @@ describe('UploadVideoAction', () => {
   it('uploads a video', async () => {
     const userEmail = faker.internet.email();
 
-    const existsBefore = await s3TestUtils.objectExists(bucketNames.ingestedVideos, videoId);
+    const blobName = `${videoId}/source`;
+
+    const existsBefore = await s3TestUtils.objectExists(bucketNames.ingestedVideos, blobName);
 
     expect(existsBefore).toBe(false);
 
-    const { id, url } = await action.execute({
+    const { videoId: actualVideoId } = await action.execute({
       data: createReadStream(filePath),
-      contentType: 'video/mp4',
+      fileName: 'sample_video1.mp4',
       userEmail,
     });
 
-    const existsAfter = await s3TestUtils.objectExists(bucketNames.ingestedVideos, videoId);
+    const existsAfter = await s3TestUtils.objectExists(bucketNames.ingestedVideos, blobName);
 
     expect(existsAfter).toBe(true);
 
-    expect(id).toEqual(videoId);
-
-    const expectedVideoUrl = `http://${bucketNames.ingestedVideos}.s3.localhost.localstack.cloud:4566/${videoId}`;
-
-    expect(url).toEqual(expectedVideoUrl);
+    expect(actualVideoId).toEqual(videoId);
 
     const message = (await amqpChannel.get(queueNames.ingestedVideos)) as GetMessage;
 
@@ -112,8 +115,43 @@ describe('UploadVideoAction', () => {
 
     expect(parsedMessage).toEqual({
       videoId,
-      videoUrl: expectedVideoUrl,
       userEmail,
     });
+  });
+
+  it('throws an error if the file has no extension', async () => {
+    const userEmail = faker.internet.email();
+
+    try {
+      await action.execute({
+        userEmail,
+        fileName: 'sample_video1',
+        data: createReadStream(filePath),
+      });
+    } catch (error) {
+      expect(error).toBeInstanceOf(OperationNotValidError);
+
+      return;
+    }
+
+    expect.fail();
+  });
+
+  it('throws an error if the file has an unsupported extension', async () => {
+    const userEmail = faker.internet.email();
+
+    try {
+      await action.execute({
+        userEmail,
+        fileName: 'sample_video1.txt',
+        data: createReadStream(filePath),
+      });
+    } catch (error) {
+      expect(error).toBeInstanceOf(OperationNotValidError);
+
+      return;
+    }
+
+    expect.fail();
   });
 });

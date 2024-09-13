@@ -38,18 +38,3 @@ services:
       - ALLOW_EMPTY_PASSWORD=yes
     ports:
       - '6379:6379'
-
-  # transcoder-api:
-  #   container_name: transcoder-api
-  #   build:
-  #     context: .
-  #     dockerfile: ./apps/api/Dockerfile
-  #   environment:
-  #     - NODE_ENV=development
-  #   ports:
-  #     - '5000:5000'
-  #   depends_on:
-  #     transcoder-redis:
-  #       condition: service_started
-  #     transcoder-rabbitmq:
-  #       condition: service_healthy

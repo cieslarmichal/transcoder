@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/naming-convention */
+
 import { type Readable } from 'node:stream';
 
 import { type Logger } from '@common/logger';
@@ -6,19 +8,43 @@ import { type S3Service } from '@common/s3';
 import { type UuidService } from '../../common/uuid/uuidService.js';
 import { bucketNames, exchangeName, routingKeys, type VideoIngestedMessage } from '@common/contracts';
 import { type Channel } from 'amqplib';
+import { OperationNotValidError } from '@common/errors';
 
 export interface UploadVideoActionPayload {
+  readonly fileName: string;
   readonly data: Readable;
-  readonly contentType: string;
   readonly userEmail: string;
 }
 
 export interface UploadVideoActionResult {
-  readonly id: string;
-  readonly url: string;
+  readonly videoId: string;
 }
 
 export class UploadVideoAction {
+  private readonly videoExtensionToContentTypeMapping: Record<string, string> = {
+    mp4: 'video/mp4',
+    mov: 'video/quicktime',
+    avi: 'video/x-msvideo',
+    mkv: 'video/x-matroska',
+    wmv: 'video/x-ms-wmv',
+    flv: 'video/x-flv',
+    webm: 'video/webm',
+    mpeg: 'video/mpeg',
+    mpg: 'video/mpeg',
+    '3gp': 'video/3gpp',
+    ogg: 'video/ogg',
+    ts: 'video/mp2t',
+    m4v: 'video/x-m4v',
+    m2ts: 'video/MP2T',
+    vob: 'video/dvd',
+    rm: 'application/vnd.rn-realmedia',
+    rmvb: 'application/vnd.rn-realmedia-vbr',
+    divx: 'video/divx',
+    asf: 'video/x-ms-asf',
+    swf: 'application/x-shockwave-flash',
+    f4v: 'video/x-f4v',
+  };
+
   public constructor(
     private readonly channel: Channel,
     private readonly s3Service: S3Service,
@@ -27,40 +53,56 @@ export class UploadVideoAction {
   ) {}
 
   public async execute(payload: UploadVideoActionPayload): Promise<UploadVideoActionResult> {
-    const { contentType, data, userEmail } = payload;
+    const { fileName, data, userEmail } = payload;
 
     this.logger.debug({
       message: 'Uploading video...',
       bucketName: bucketNames.ingestedVideos,
-      contentType,
+      fileName,
       userEmail,
     });
 
+    const fileExtension = fileName.split('.').pop();
+
+    if (!fileExtension) {
+      throw new OperationNotValidError({
+        reason: 'File has no extension.',
+        fileName,
+      });
+    }
+
+    const videoContentType = this.videoExtensionToContentTypeMapping[fileExtension];
+
+    if (!videoContentType) {
+      throw new OperationNotValidError({
+        reason: 'File is not a video.',
+        fileName,
+      });
+    }
+
     const videoId = this.uuidService.generateUuid();
 
-    const { location: videoUrl } = await this.s3Service.uploadBlob({
+    const blobName = `${videoId}/source`;
+
+    await this.s3Service.uploadBlob({
       bucketName: bucketNames.ingestedVideos,
-      blobName: videoId,
+      blobName,
       data,
-      contentType,
+      contentType: videoContentType,
     });
 
     this.logger.debug({
       message: 'Video uploaded.',
-      videoUrl,
+      blobName,
     });
 
     const message = {
       videoId,
-      videoUrl,
       userEmail,
     } satisfies VideoIngestedMessage;
 
     this.channel.publish(exchangeName, routingKeys.videoIngested, Buffer.from(JSON.stringify(message)));
 
-    return {
-      id: videoId,
-      url: videoUrl,
-    };
+    return { videoId };
   }
 }

@@ -20,30 +20,30 @@ export class RedisClientFactory {
     });
 
     client.on('connect', () => {
-      this.logger.info({ message: 'Redis client connected' });
+      this.logger.info({ message: 'Redis client connected.' });
     });
 
     client.on('ready', () => {
-      this.logger.info({ message: 'Redis client ready' });
+      this.logger.info({ message: 'Redis client ready.' });
     });
 
     client.on('error', (error) => {
       this.logger.error({
-        message: 'Redis error',
+        message: 'Redis error.',
         error,
       });
     });
 
     client.on('close', () => {
-      this.logger.info({ message: 'Redis client connection closed' });
+      this.logger.info({ message: 'Redis client connection closed.' });
     });
 
     client.on('reconnecting', () => {
-      this.logger.info({ message: 'Redis client reconnecting' });
+      this.logger.info({ message: 'Redis client reconnecting.' });
     });
 
     client.on('end', () => {
-      this.logger.info({ message: 'Redis client connection ended' });
+      this.logger.info({ message: 'Redis client connection ended.' });
     });
 
     return client;
