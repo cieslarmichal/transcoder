@@ -5,17 +5,20 @@ import { expect, describe, it, beforeEach, afterEach } from 'vitest';
 import { AwsRegion, S3ClientFactory } from './s3ClientFactory.js';
 import { S3Service } from './s3Service.js';
 import { S3TestUtils } from '../tests/s3TestUtils.js';
+import { randomUUID } from 'node:crypto';
 
 describe('S3Service', () => {
   let s3Service: S3Service;
 
   let s3TestUtils: S3TestUtils;
 
-  const resourcesDirectory = path.resolve(__dirname, '../../../../../../../resources');
+  const resourcesDirectory = path.resolve(__dirname, '../../../resources');
 
-  const sampleFileName1 = 'book1.jpg';
+  const sampleFileName = 'sample_image.jpg';
 
-  const bucketName = 'misyma-images';
+  const blobName = randomUUID();
+
+  const bucketName = 'test-images';
 
   beforeEach(async () => {
     const s3Client = S3ClientFactory.create({
@@ -42,7 +45,7 @@ describe('S3Service', () => {
 
       const resourceExists = await s3Service.blobExists({
         bucketName: nonExistingBucketName,
-        blobName: sampleFileName1,
+        blobName,
       });
 
       expect(resourceExists).toBe(false);
@@ -60,11 +63,11 @@ describe('S3Service', () => {
     });
 
     it('returns true - when resource exists', async () => {
-      await s3TestUtils.uploadObject(bucketName, sampleFileName1, path.join(resourcesDirectory, sampleFileName1));
+      await s3TestUtils.uploadObject(bucketName, blobName, path.join(resourcesDirectory, sampleFileName));
 
       const resourceExists = await s3Service.blobExists({
         bucketName,
-        blobName: sampleFileName1,
+        blobName,
       });
 
       expect(resourceExists).toBe(true);
@@ -78,7 +81,7 @@ describe('S3Service', () => {
       try {
         await s3Service.deleteBlob({
           bucketName: nonExistingBucketName,
-          blobName: sampleFileName1,
+          blobName,
         });
       } catch (error) {
         expect(error).toBeDefined();
@@ -107,18 +110,18 @@ describe('S3Service', () => {
     });
 
     it('deletes a resource', async () => {
-      await s3TestUtils.uploadObject(bucketName, sampleFileName1, path.join(resourcesDirectory, sampleFileName1));
+      await s3TestUtils.uploadObject(bucketName, blobName, path.join(resourcesDirectory, sampleFileName));
 
-      const existsBefore = await s3TestUtils.objectExists(bucketName, sampleFileName1);
+      const existsBefore = await s3TestUtils.objectExists(bucketName, blobName);
 
       expect(existsBefore).toBe(true);
 
       await s3Service.deleteBlob({
         bucketName,
-        blobName: sampleFileName1,
+        blobName,
       });
 
-      const existsAfter = await s3TestUtils.objectExists(bucketName, sampleFileName1);
+      const existsAfter = await s3TestUtils.objectExists(bucketName, blobName);
 
       expect(existsAfter).toBe(false);
     });
@@ -126,14 +129,14 @@ describe('S3Service', () => {
 
   describe('upload', () => {
     it('throws an error - when bucket does not exist', async () => {
-      const filePath = path.join(resourcesDirectory, sampleFileName1);
+      const filePath = path.join(resourcesDirectory, sampleFileName);
 
       const nonExistingBucketName = 'non-existing-bucket';
 
       try {
         await s3Service.uploadBlob({
           bucketName: nonExistingBucketName,
-          blobName: sampleFileName1,
+          blobName,
           data: createReadStream(filePath),
           contentType: 'image/jpg',
         });
@@ -147,18 +150,121 @@ describe('S3Service', () => {
     });
 
     it('uploads a resource', async () => {
-      const filePath = path.join(resourcesDirectory, sampleFileName1);
+      const filePath = path.join(resourcesDirectory, sampleFileName);
 
       await s3Service.uploadBlob({
         bucketName,
-        blobName: sampleFileName1,
+        blobName,
         data: createReadStream(filePath),
         contentType: 'image/jpg',
       });
 
-      const exists = await s3TestUtils.objectExists(bucketName, sampleFileName1);
+      const exists = await s3TestUtils.objectExists(bucketName, blobName);
 
       expect(exists).toBe(true);
+    });
+  });
+
+  describe('getBlobUrl', () => {
+    it('throws an error - when bucket does not exist', async () => {
+      const nonExistingBucketName = 'non-existing-bucket';
+
+      try {
+        await s3Service.getBlobUrl({
+          bucketName: nonExistingBucketName,
+          blobName,
+        });
+      } catch (error) {
+        expect(error).toBeDefined();
+
+        return;
+      }
+
+      expect.fail();
+    });
+
+    it('throws an error - when resource does not exist', async () => {
+      const nonExistingResourceName = 'non-existing-resource';
+
+      try {
+        await s3Service.getBlobUrl({
+          bucketName,
+          blobName: nonExistingResourceName,
+        });
+      } catch (error) {
+        expect(error).toBeDefined();
+
+        return;
+      }
+
+      expect.fail();
+    });
+
+    it('returns a signed URL', async () => {
+      await s3TestUtils.uploadObject(bucketName, blobName, path.join(resourcesDirectory, sampleFileName));
+
+      const url = await s3Service.getBlobUrl({
+        bucketName,
+        blobName,
+      });
+
+      expect(url).toBeDefined();
+    });
+  });
+
+  describe('getBlobsUrls', () => {
+    it('throws an error - when bucket does not exist', async () => {
+      const nonExistingBucketName = 'non-existing-bucket';
+
+      try {
+        await s3Service.getBlobsUrls({
+          bucketName: nonExistingBucketName,
+          prefix: 'prefix',
+        });
+      } catch (error) {
+        expect(error).toBeDefined();
+
+        return;
+      }
+
+      expect.fail();
+    });
+
+    it('returns URLs for resources', async () => {
+      const filePath = path.join(resourcesDirectory, sampleFileName);
+
+      await s3Service.uploadBlob({
+        bucketName,
+        blobName: `${blobName}/1`,
+        data: createReadStream(filePath),
+        contentType: 'image/jpg',
+      });
+
+      await s3Service.uploadBlob({
+        bucketName,
+        blobName: `${blobName}/2`,
+        data: createReadStream(filePath),
+        contentType: 'image/jpg',
+      });
+
+      const result = await s3Service.getBlobsUrls({
+        bucketName,
+        prefix: blobName,
+      });
+
+      expect(result.length).toBe(2);
+
+      result.forEach((item) => {
+        expect(item.name.startsWith(blobName)).toBe(true);
+
+        expect(item.name.endsWith('1') || item.name.endsWith('2')).toBe(true);
+
+        expect(item.contentType).toBe('image/jpg');
+
+        expect(item.url.includes(blobName)).toBe(true);
+
+        expect(item.url.includes(bucketName)).toBe(true);
+      });
     });
   });
 });

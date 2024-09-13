@@ -1,7 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/naming-convention */
 
-import { DeleteObjectCommand, ListObjectsV2Command, type S3Client } from '@aws-sdk/client-s3';
+import {
+  DeleteObjectCommand,
+  GetObjectCommand,
+  HeadObjectCommand,
+  ListObjectsV2Command,
+  type S3Client,
+} from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
 import { type Readable } from 'node:stream';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
@@ -20,6 +26,11 @@ export interface UploadBlobResult {
 
 export interface GetBlobUrlPayload {
   readonly blobName: string;
+  readonly bucketName: string;
+}
+
+export interface GetBlobsUrlsPayload {
+  readonly prefix: string;
   readonly bucketName: string;
 }
 
@@ -62,14 +73,71 @@ export class S3Service {
   public async getBlobUrl(payload: GetBlobUrlPayload): Promise<string> {
     const { blobName, bucketName } = payload;
 
-    const command = new GetObjectCommand({
+    const exists = await this.blobExists({
+      blobName,
+      bucketName,
+    });
+
+    if (!exists) {
+      throw new OperationNotValidError({
+        reason: 'Resource does not exist in bucket.',
+        blobName,
+        bucketName,
+      });
+    }
+
+    const url = await getSignedUrl(
+      this.s3Client,
+      new GetObjectCommand({
+        Bucket: bucketName,
+        Key: blobName,
+      }),
+      { expiresIn: 86400 },
+    );
+
+    return url;
+  }
+
+  public async getBlobsUrls(
+    payload: GetBlobsUrlsPayload,
+  ): Promise<{ name: string; url: string; contentType: string }[]> {
+    const { prefix, bucketName } = payload;
+
+    const command = new ListObjectsV2Command({
       Bucket: bucketName,
-      Key: blobName,
+      Prefix: prefix,
     });
 
     const result = await this.s3Client.send(command);
 
-    return result.Body as string;
+    if (!result.Contents) {
+      return [];
+    }
+
+    return Promise.all(
+      result.Contents.map(async (data) => {
+        const name = data.Key as string;
+
+        const [url, metadata] = await Promise.all([
+          getSignedUrl(
+            this.s3Client,
+            new GetObjectCommand({
+              Bucket: bucketName,
+              Key: name,
+            }),
+            { expiresIn: 86400 },
+          ),
+          this.s3Client.send(
+            new HeadObjectCommand({
+              Bucket: bucketName,
+              Key: name,
+            }),
+          ),
+        ]);
+
+        return { name, url, contentType: metadata.ContentType as string };
+      }),
+    );
   }
 
   public async blobExists(payload: BlobExistsPayload): Promise<boolean> {

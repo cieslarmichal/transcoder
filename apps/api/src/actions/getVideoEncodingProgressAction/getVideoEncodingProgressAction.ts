@@ -28,7 +28,7 @@ export class GetVideoEncodingProgressAction {
 
     const encodingProgress = await this.redisClient.hgetall(redisKey);
 
-    if (!encodingProgress) {
+    if (Object.keys(encodingProgress).length === 0) {
       throw new ResourceNotFoundError({
         resource: 'EncodingProgress',
         id: videoId,

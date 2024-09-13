@@ -13,7 +13,9 @@
   ],
   "scripts": {
     "build": "tsc --build tsconfig.json",
-    "build:dev": "tsc --build tsconfig.json"
+    "build:dev": "tsc --build tsconfig.json",
+    "lint": "eslint . -c ../../eslint.config.mjs --max-warnings 0",
+    "lint:fix": "npm run lint -- --fix"
   },
   "volta": {
     "node": "20.17.0",

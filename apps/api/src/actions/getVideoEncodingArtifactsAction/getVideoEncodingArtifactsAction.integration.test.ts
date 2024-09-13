@@ -1,20 +1,25 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import { faker } from '@faker-js/faker';
 import { expect, describe, it, beforeEach, afterEach } from 'vitest';
 
 import { LoggerFactory } from '@common/logger';
 
 import { ConfigFactory, type Config } from '../../config.js';
-import { RedisClientFactory, type RedisClient } from '@common/redis';
-import { ResourceNotFoundError } from '@common/errors';
 import { GetVideoEncodingArtifactsAction } from './getVideoEncodingArtifactsAction.js';
+import { S3ClientFactory, S3Service } from '@common/s3';
+import { S3TestUtils } from '@common/s3/tests';
+import { bucketNames } from '@common/contracts';
+import { join, resolve } from 'node:path';
 
 describe('GetVideoEncodingArtifactsAction', () => {
   let action: GetVideoEncodingArtifactsAction;
 
   let config: Config;
 
-  let redisClient: RedisClient;
+  let s3TestUtils: S3TestUtils;
+
+  const resourcesDirectory = resolve(__dirname, '../../../../../resources');
+
+  const sampleFileName = 'sample_video1.mp4';
 
   beforeEach(async () => {
     config = ConfigFactory.create();
@@ -24,54 +29,75 @@ describe('GetVideoEncodingArtifactsAction', () => {
       logLevel: config.logLevel,
     });
 
-    redisClient = new RedisClientFactory(logger).create(config.redis);
+    const s3Client = S3ClientFactory.create(config.aws);
 
-    action = new GetVideoEncodingArtifactsAction(redisClient, logger);
+    const s3Service = new S3Service(s3Client);
 
-    await redisClient.flushall();
+    action = new GetVideoEncodingArtifactsAction(s3Service, logger);
+
+    s3TestUtils = new S3TestUtils(s3Client);
+
+    await s3TestUtils.createBucket(bucketNames.encodingArtifacts);
   });
 
   afterEach(async () => {
-    await redisClient.flushall();
-
-    await redisClient.quit();
+    await s3TestUtils.deleteBucket(bucketNames.encodingArtifacts);
   });
 
   it('gets video encoding artifacts', async () => {
     const videoId = faker.string.uuid();
 
-    const redisKey = `${videoId}-encoding-progress`;
+    const encoded360pBlobName = `${videoId}/360p`;
 
-    await redisClient.hset(redisKey, {
-      '1080p': '75%',
-      '720p': '55%',
-      '480p': '30%',
-      '360p': '100%',
-      preview: '100%',
-      preview_360p: '100%',
-      preview_1080p: '3%',
+    const encodedPreviewBlobName = `${videoId}/preview`;
+
+    const encodedPreview360pBlobName = `${videoId}/preview_360p`;
+
+    const contentType = 'video/mp4';
+
+    await s3TestUtils.uploadObject(
+      bucketNames.encodingArtifacts,
+      encoded360pBlobName,
+      join(resourcesDirectory, sampleFileName),
+      contentType,
+    );
+
+    await s3TestUtils.uploadObject(
+      bucketNames.encodingArtifacts,
+      encodedPreviewBlobName,
+      join(resourcesDirectory, sampleFileName),
+      contentType,
+    );
+
+    await s3TestUtils.uploadObject(
+      bucketNames.encodingArtifacts,
+      encodedPreview360pBlobName,
+      join(resourcesDirectory, sampleFileName),
+      contentType,
+    );
+
+    const { encodingArtifacts } = await action.execute({ videoId });
+
+    encodingArtifacts.every((artifact) => {
+      expect(artifact.url).toContain(bucketNames.encodingArtifacts);
+
+      expect(artifact.url).toContain(videoId);
+
+      expect(['360p', 'preview', 'preview_360p'].some((id) => artifact.url.includes(id))).toBe(true);
     });
 
-    const { encodedArtifacts } = await action.execute({ videoId });
-
     expect(encodingArtifacts).toEqual([
-      { id: '1080p', progress: '75%' },
-      { id: '720p', progress: '55%' },
-      { id: '480p', progress: '30%' },
-      { id: '360p', progress: '10%' },
-      { id: 'preview', progress: '0%' },
-      { id: 'preview_360p', progress: '1%' },
-      { id: 'preview_1080p', progress: '3%' },
+      { id: '360p', url: expect.any(String), contentType },
+      { id: 'preview', url: expect.any(String), contentType },
+      { id: 'preview_360p', url: expect.any(String), contentType },
     ]);
   });
 
-  it('throws error if video artifacts not found', async () => {
+  it('returns empty array if video artifacts not found', async () => {
     const videoId = faker.string.uuid();
 
-    try {
-      await action.execute({ videoId });
-    } catch (error) {
-      expect(error).toBeInstanceOf(ResourceNotFoundError);
-    }
+    const result = await action.execute({ videoId });
+
+    expect(result.encodingArtifacts).toHaveLength(0);
   });
 });

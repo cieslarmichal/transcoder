@@ -1,8 +1,8 @@
 import { faker } from '@faker-js/faker';
 import { randomUUID } from 'node:crypto';
 import { createReadStream } from 'node:fs';
-import path from 'path';
 import { expect, describe, it, beforeEach, afterEach } from 'vitest';
+import { resolve, join } from 'node:path';
 
 import { LoggerFactory } from '@common/logger';
 import { S3ClientFactory, S3Service } from '@common/s3';
@@ -26,11 +26,11 @@ describe('UploadVideoAction', () => {
 
   let amqpChannel: Channel;
 
-  const resourcesDirectory = path.resolve(__dirname, '../../../../../resources');
+  const resourcesDirectory = resolve(__dirname, '../../../../../resources');
 
   const sampleFileName = 'sample_video1.mp4';
 
-  const filePath = path.join(resourcesDirectory, sampleFileName);
+  const filePath = join(resourcesDirectory, sampleFileName);
 
   const videoId = randomUUID();
 
@@ -109,7 +109,7 @@ describe('UploadVideoAction', () => {
     expect(parsedMessage).toEqual({
       videoId,
       userEmail,
-      url: `http://transcoder-ingested-videos.s3.localhost.localstack.cloud:4566/${videoId}`,
+      url: `http://${bucketNames.ingestedVideos}.s3.localhost.localstack.cloud:4566/${videoId}`,
     });
   });
 });

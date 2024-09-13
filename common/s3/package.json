@@ -17,7 +17,11 @@
   ],
   "scripts": {
     "build": "tsc --build tsconfig.prod.json",
-    "build:dev": "tsc --build tsconfig.json"
+    "build:dev": "tsc --build tsconfig.json",
+    "test:integration": "NODE_ENV=test vitest --config vitest.integration.config.js .integration.test.ts",
+    "test:integration:run": "npm run test:integration -- --run",
+    "lint": "eslint . -c ../../eslint.config.mjs --max-warnings 0",
+    "lint:fix": "npm run lint -- --fix"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "3.592.0",

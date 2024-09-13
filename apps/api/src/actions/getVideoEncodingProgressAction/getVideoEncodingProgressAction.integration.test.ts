@@ -72,6 +72,10 @@ describe('GetVideoEncodingProgressAction', () => {
       await action.execute({ videoId });
     } catch (error) {
       expect(error).toBeInstanceOf(ResourceNotFoundError);
+
+      return;
     }
+
+    expect.fail();
   });
 });

@@ -85,7 +85,12 @@ export class S3TestUtils {
     return result.Contents.some((metadata) => metadata.Key === objectKey);
   }
 
-  public async uploadObject(bucketName: string, objectKey: string, filePath: string): Promise<void> {
+  public async uploadObject(
+    bucketName: string,
+    objectKey: string,
+    filePath: string,
+    contentType?: string,
+  ): Promise<void> {
     if (await this.objectExists(bucketName, objectKey)) {
       return;
     }
@@ -97,7 +102,7 @@ export class S3TestUtils {
         Bucket: bucketName,
         Key: objectKey,
         Body: objectData,
-        ContentType: 'application/octet-stream',
+        ContentType: contentType ? contentType : 'application/octet-stream',
       });
 
       await this.s3Client.send(command);
