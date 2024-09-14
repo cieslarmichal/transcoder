@@ -95,7 +95,7 @@ describe('UploadVideoAction', () => {
 
     expect(existsBefore).toBe(false);
 
-    const { videoId: actualVideoId } = await action.execute({
+    const result = await action.execute({
       data: createReadStream(filePath),
       fileName: 'sample_video1.mp4',
       userEmail,
@@ -105,7 +105,11 @@ describe('UploadVideoAction', () => {
 
     expect(existsAfter).toBe(true);
 
-    expect(actualVideoId).toEqual(videoId);
+    expect(result.videoId).toEqual(videoId);
+
+    expect(result.downloadUrl).toContain(bucketNames.ingestedVideos);
+
+    expect(result.downloadUrl).toContain(blobName);
 
     const message = (await amqpChannel.get(queueNames.ingestedVideos)) as GetMessage;
 
@@ -113,10 +117,13 @@ describe('UploadVideoAction', () => {
 
     const parsedMessage = JSON.parse(message.content.toString());
 
-    expect(parsedMessage).toEqual({
-      videoId,
-      userEmail,
-    });
+    expect(parsedMessage.videoId).toEqual(videoId);
+
+    expect(parsedMessage.downloadUrl).toContain(bucketNames.ingestedVideos);
+
+    expect(parsedMessage.downloadUrl).toContain(blobName);
+
+    expect(parsedMessage.userEmail).toEqual(userEmail);
   });
 
   it('throws an error if the file has no extension', async () => {

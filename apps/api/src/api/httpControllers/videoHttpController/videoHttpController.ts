@@ -115,7 +115,7 @@ export class VideoHttpController implements HttpController {
 
     const { name: fileName, filePath } = requestFile;
 
-    const { videoId } = await this.uploadFileAction.execute({
+    const { videoId, downloadUrl } = await this.uploadFileAction.execute({
       userEmail: notificationEmail,
       fileName,
       data: createReadStream(filePath),
@@ -123,7 +123,10 @@ export class VideoHttpController implements HttpController {
 
     return {
       statusCode: HttpStatusCode.created,
-      body: { videoId },
+      body: {
+        videoId,
+        downloadUrl,
+      },
     };
   }
 

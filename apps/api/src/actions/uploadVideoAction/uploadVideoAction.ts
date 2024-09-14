@@ -18,6 +18,7 @@ export interface UploadVideoActionPayload {
 
 export interface UploadVideoActionResult {
   readonly videoId: string;
+  readonly downloadUrl: string;
 }
 
 export class UploadVideoAction {
@@ -92,18 +93,28 @@ export class UploadVideoAction {
       contentType: videoContentType,
     });
 
+    const downloadUrl = await this.s3Service.getBlobUrl({
+      bucketName: bucketNames.ingestedVideos,
+      blobName,
+    });
+
     this.logger.debug({
       message: 'Video uploaded.',
       blobName,
+      downloadUrl,
     });
 
     const message = {
       videoId,
+      downloadUrl,
       userEmail,
     } satisfies VideoIngestedMessage;
 
     this.channel.publish(exchangeName, routingKeys.videoIngested, Buffer.from(JSON.stringify(message)));
 
-    return { videoId };
+    return {
+      videoId,
+      downloadUrl,
+    };
   }
 }
