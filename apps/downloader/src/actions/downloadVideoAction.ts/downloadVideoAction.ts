@@ -4,9 +4,9 @@ import { type Logger } from '@common/logger';
 import axios from 'axios';
 import { type Config } from '../../config.js';
 import { createWriteStream } from 'node:fs';
-import { type Channel } from 'amqplib';
 import { OperationNotValidError } from '@common/errors';
 import { exchangeName, routingKeys, type VideoDownloadedMessage } from '@common/contracts';
+import { type AmqpChannel } from '@common/amqp';
 
 export interface DownloadVideoActionPayload {
   readonly videoId: string;
@@ -38,7 +38,7 @@ export class DownloadVideoAction {
   };
 
   public constructor(
-    private readonly channel: Channel,
+    private readonly amqpChannel: AmqpChannel,
     private readonly logger: Logger,
     private readonly config: Config,
   ) {}
@@ -92,7 +92,7 @@ export class DownloadVideoAction {
       location: outputPath,
     } satisfies VideoDownloadedMessage;
 
-    this.channel.publish(exchangeName, routingKeys.videoDownloaded, Buffer.from(JSON.stringify(message)));
+    this.amqpChannel.publish(exchangeName, routingKeys.videoDownloaded, Buffer.from(JSON.stringify(message)));
 
     this.logger.info({
       message: 'Video downloaded',

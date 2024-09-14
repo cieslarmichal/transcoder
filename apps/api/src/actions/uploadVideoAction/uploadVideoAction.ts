@@ -7,9 +7,9 @@ import { type S3Service } from '@common/s3';
 
 import { type UuidService } from '../../common/uuid/uuidService.js';
 import { bucketNames, exchangeName, routingKeys, type VideoIngestedMessage } from '@common/contracts';
-import { type Channel } from 'amqplib';
 import { OperationNotValidError } from '@common/errors';
 import { type RedisClient } from '@common/redis';
+import { type AmqpChannel } from '@common/amqp';
 
 export interface UploadVideoActionPayload {
   readonly fileName: string;
@@ -48,7 +48,7 @@ export class UploadVideoAction {
   };
 
   public constructor(
-    private readonly channel: Channel,
+    private readonly amqpChannel: AmqpChannel,
     private readonly s3Service: S3Service,
     private readonly redisClient: RedisClient,
     private readonly uuidService: UuidService,
@@ -115,7 +115,7 @@ export class UploadVideoAction {
       downloadUrl,
     } satisfies VideoIngestedMessage;
 
-    this.channel.publish(exchangeName, routingKeys.videoIngested, Buffer.from(JSON.stringify(message)));
+    this.amqpChannel.publish(exchangeName, routingKeys.videoIngested, Buffer.from(JSON.stringify(message)));
 
     return {
       videoId,

@@ -1,8 +1,7 @@
-import { AmqpProvisioner, MessageConsumerExecutor } from '@common/amqp';
+import { type AmqpChannel, type AmqpConnection, AmqpProvisioner, MessageConsumerExecutor } from '@common/amqp';
 import { type Logger, LoggerFactory } from '@common/logger';
 
 import { type Config, ConfigFactory } from './config.js';
-import { type Channel, type Connection } from 'amqplib';
 import { exchangeName, queueNames, routingKeys } from '@common/contracts';
 import { VideoIngestedMessageHandler } from './api/messageConsumers/videoIngestedMessageConsumer.js';
 import { DownloadVideoAction } from './actions/downloadVideoAction.ts/downloadVideoAction.js';
@@ -10,8 +9,8 @@ import { DownloadVideoAction } from './actions/downloadVideoAction.ts/downloadVi
 export class Application {
   private readonly config: Config;
   private readonly logger: Logger;
-  private amqpConnection: Connection | undefined;
-  private amqpChannel: Channel | undefined;
+  private amqpConnection: AmqpConnection | undefined;
+  private amqpChannel: AmqpChannel | undefined;
   private readonly amqpProvisioner: AmqpProvisioner;
 
   public constructor() {
@@ -28,13 +27,13 @@ export class Application {
   public async start(): Promise<void> {
     await this.setupAmqp();
 
-    const downloadVideoAction = new DownloadVideoAction(this.logger, this.config);
+    const downloadVideoAction = new DownloadVideoAction(this.amqpChannel as AmqpChannel, this.logger, this.config);
 
     const messageConsumer = new VideoIngestedMessageHandler(downloadVideoAction);
 
     const messageConsumerExecutor = new MessageConsumerExecutor(
       messageConsumer,
-      this.amqpChannel as Channel,
+      this.amqpChannel as AmqpChannel,
       this.logger,
       queueNames.ingestedVideos,
       this.config.amqp.redeliveryDropThreshold,

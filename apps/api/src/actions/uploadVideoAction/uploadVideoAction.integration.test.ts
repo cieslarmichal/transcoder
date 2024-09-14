@@ -11,8 +11,7 @@ import { S3TestUtils } from '@common/s3/tests';
 import { UploadVideoAction } from './uploadVideoAction.js';
 import { type UuidService } from '../../common/uuid/uuidService.js';
 import { ConfigFactory, type Config } from '../../config.js';
-import { type GetMessage, type Channel, type Connection } from 'amqplib';
-import { AmqpProvisioner } from '@common/amqp';
+import { AmqpProvisioner, type AmqpChannel, type AmqpConnection, type AmqpGetMessageResult } from '@common/amqp';
 import { exchangeName, queueNames, routingKeys, bucketNames } from '@common/contracts';
 import { OperationNotValidError } from '@common/errors';
 import { type RedisClient, RedisClientFactory } from '@common/redis';
@@ -24,9 +23,9 @@ describe('UploadVideoAction', () => {
 
   let config: Config;
 
-  let amqpConnection: Connection;
+  let amqpConnection: AmqpConnection;
 
-  let amqpChannel: Channel;
+  let amqpChannel: AmqpChannel;
 
   let redisClient: RedisClient;
 
@@ -120,7 +119,7 @@ describe('UploadVideoAction', () => {
 
     expect(result.downloadUrl).toContain(blobName);
 
-    const message = (await amqpChannel.get(queueNames.ingestedVideos)) as GetMessage;
+    const message = (await amqpChannel.get(queueNames.ingestedVideos)) as AmqpGetMessageResult;
 
     expect(message).not.toBe(false);
 

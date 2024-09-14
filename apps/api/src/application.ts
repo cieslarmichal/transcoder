@@ -1,4 +1,4 @@
-import { AmqpProvisioner } from '@common/amqp';
+import { AmqpProvisioner, type AmqpChannel, type AmqpConnection } from '@common/amqp';
 import { type Logger, LoggerFactory } from '@common/logger';
 import { S3ClientFactory, S3Service } from '@common/s3';
 
@@ -8,7 +8,6 @@ import { VideoHttpController } from './api/httpControllers/videoHttpController/v
 import { UuidService } from './common/uuid/uuidService.js';
 import { type Config, ConfigFactory } from './config.js';
 import { HttpServer } from './httpServer.js';
-import { type Channel, type Connection } from 'amqplib';
 import { exchangeName, queueNames, routingKeys } from '@common/contracts';
 import { RedisClientFactory, type RedisClient } from '@common/redis';
 import { GetVideoEncodingProgressAction } from './actions/getVideoEncodingProgressAction/getVideoEncodingProgressAction.js';
@@ -18,8 +17,8 @@ export class Application {
   private readonly config: Config;
   private readonly logger: Logger;
   private httpServer: HttpServer | undefined;
-  private amqpConnection: Connection | undefined;
-  private amqpChannel: Channel | undefined;
+  private amqpConnection: AmqpConnection | undefined;
+  private amqpChannel: AmqpChannel | undefined;
   private readonly amqpProvisioner: AmqpProvisioner;
   private readonly redisClient: RedisClient;
 
@@ -46,7 +45,7 @@ export class Application {
     const applicationHttpController = new ApplicationHttpController();
 
     const uploadVideoAction = new UploadVideoAction(
-      this.amqpChannel as Channel,
+      this.amqpChannel as AmqpChannel,
       s3Service,
       this.redisClient,
       uuidService,
