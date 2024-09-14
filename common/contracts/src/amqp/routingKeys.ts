@@ -1,6 +1,7 @@
 export const routingKeys = {
   videoIngested: 'video.ingested',
   videoDownloaded: 'video.downloaded',
+  videoEncodingRequested: 'video.encoding.requested',
   videoEncoded: 'video.encoded',
-  artifactUploaded: 'artifact.uploaded',
+  videoArtifactUploaded: 'video.artifact.uploaded',
 };

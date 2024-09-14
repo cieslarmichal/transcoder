@@ -6,9 +6,10 @@
 flowchart TB
   API[API Service]:::service
   DOWNLOADER[Downloader Service]:::service
+  ENCODING_DIRECTOR[Encoding Director Service]:::service
+  ENCODER[Encoder Service]:::service
   UPLOADER[Uploader Service]:::service
   NOTIFIER[Notifier Service]:::service
-  ENCODER[Encoder Service]:::service
 
   USERS[Users]:::external
   RABBITMQ[RabbitMQ]:::external
@@ -28,7 +29,10 @@ flowchart TB
   DOWNLOADER -->|video download| S3
   DOWNLOADER -->|done| RABBITMQ
 
-  RABBITMQ -->|url with encoding format| ENCODER
+  RABBITMQ -->|video id| ENCODING_DIRECTOR
+  ENCODING_DIRECTOR -->|video encoding profile| RABBITMQ
+
+  RABBITMQ -->|video path with encoding profile| ENCODER
   ENCODER -->|save progress| REDIS
   ENCODER -->|done| RABBITMQ
 
@@ -47,15 +51,17 @@ flowchart TB
 ## RabbitMQ Architecture
 
 ```mermaid
-flowchart TB
+flowchart LR
   API[API Service]:::service
   DOWNLOADER[Downloader Service]:::service
+  ENCODING_DIRECTOR[Encoding Director Service]:::service
   ENCODER[Encoder Service]:::service
   UPLOADER[Uploader Service]:::service
   NOTIFIER[Notifier Service]:::service
 
   INGESTED_VIDEOS[ingested-videos queue]:::queue
   DOWNLOADED_VIDEOS[downloaded-videos queue]:::queue
+  ENCODING_REQUESTS[encoding-requests queue]:::queue
   ENCODED_VIDEOS[encoded-videos queue]:::queue
   UPLOADED_ARTIFACTS[uploaded-artifacts queue]:::queue
 
@@ -67,13 +73,17 @@ flowchart TB
 
   DOWNLOADER -->|video.downloaded| EXCHANGE
   EXCHANGE --> DOWNLOADED_VIDEOS
-  DOWNLOADED_VIDEOS --> ENCODER
+  DOWNLOADED_VIDEOS --> ENCODING_DIRECTOR
+
+  ENCODING_DIRECTOR -->|video.encoding.requested| EXCHANGE
+  EXCHANGE --> ENCODING_REQUESTS
+  ENCODING_REQUESTS --> ENCODER
   
   ENCODER -->|video.encoded| EXCHANGE
   EXCHANGE --> ENCODED_VIDEOS
   ENCODED_VIDEOS --> UPLOADER
 
-  UPLOADER -->|artifact.uploaded| EXCHANGE
+  UPLOADER -->|video.artifact.uploaded| EXCHANGE
   EXCHANGE --> UPLOADED_ARTIFACTS
   UPLOADED_ARTIFACTS --> NOTIFIER
 
