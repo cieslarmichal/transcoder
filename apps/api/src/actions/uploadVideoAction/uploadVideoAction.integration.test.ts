@@ -1,5 +1,4 @@
 import { faker } from '@faker-js/faker';
-import { randomUUID } from 'node:crypto';
 import { createReadStream } from 'node:fs';
 import { expect, describe, it, beforeEach, afterEach } from 'vitest';
 import { resolve, join } from 'node:path';
@@ -35,7 +34,7 @@ describe('UploadVideoAction', () => {
 
   const filePath = join(resourcesDirectory, sampleFileName);
 
-  const videoId = randomUUID();
+  const videoId = faker.string.uuid();
 
   beforeEach(async () => {
     const uuidService = {

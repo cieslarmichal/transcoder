@@ -50,5 +50,16 @@ services:
     volumes:
       - shared-storage:/shared
 
+  transcoder-encoding-director:
+    container_name: transcoder-encoding-director
+    build:
+      context: .
+      dockerfile: ./apps/encoding-director/Dockerfile
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      transcoder-rabbitmq:
+        condition: service_healthy
+
 volumes:
   shared-storage:

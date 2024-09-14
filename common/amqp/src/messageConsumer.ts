@@ -1,8 +1,8 @@
-export interface ConsumePayload<Message> {
-  readonly message: Message;
+export interface ConsumePayload {
+  readonly message: unknown;
   readonly routingKey: string;
 }
 
-export interface MessageConsumer<Message = unknown> {
-  consume(payload: ConsumePayload<Message>): Promise<void>;
+export interface MessageConsumer {
+  consume(payload: ConsumePayload): Promise<void>;
 }

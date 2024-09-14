@@ -3,8 +3,11 @@
   "compilerOptions": {
     "outDir": "./dist",
   },
-  "include": ["src/**/*.ts", "tests/**/*.ts", "src/actions/downloadVideoAction"],
-  "exclude": [],
+  "include": ["src/**/*.ts"],
+  "exclude": [
+    "src/**/tests/**/*",
+    "src/**/*.test.ts"
+  ],
   "references": [
     {
       "path": "../../common/amqp/tsconfig.json"
@@ -17,6 +20,6 @@
     },
     {
       "path": "../../common/logger/tsconfig.json"
-    }
+    },
   ]
 }

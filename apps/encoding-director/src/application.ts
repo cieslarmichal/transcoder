@@ -3,8 +3,8 @@ import { type Logger, LoggerFactory } from '@common/logger';
 
 import { type Config, ConfigFactory } from './config.js';
 import { exchangeName, queueNames, routingKeys } from '@common/contracts';
-import { VideoIngestedMessageConsumer } from './api/messageConsumers/videoIngestedMessageConsumer.js';
-import { DownloadVideoAction } from './actions/downloadVideoAction/downloadVideoAction.js';
+import { VideoDownloadedMessageConsumer } from './api/messageConsumers/videoDownloadedMessageConsumer.js';
+import { RequestVideoEncodingsAction } from './actions/requestVideoEncodingsAction/requestVideoEncodingsAction.js';
 
 export class Application {
   private readonly config: Config;
@@ -27,9 +27,13 @@ export class Application {
   public async start(): Promise<void> {
     await this.setupAmqp();
 
-    const downloadVideoAction = new DownloadVideoAction(this.amqpChannel as AmqpChannel, this.logger, this.config);
+    const requestVideoEncodingsAction = new RequestVideoEncodingsAction(
+      this.amqpChannel as AmqpChannel,
+      this.logger,
+      this.config,
+    );
 
-    const messageConsumer = new VideoIngestedMessageConsumer(downloadVideoAction);
+    const messageConsumer = new VideoDownloadedMessageConsumer(requestVideoEncodingsAction);
 
     const messageConsumerExecutor = new MessageConsumerExecutor(
       messageConsumer,
@@ -58,16 +62,16 @@ export class Application {
     await this.amqpProvisioner.createQueue({
       channel: this.amqpChannel,
       exchangeName,
-      queueName: queueNames.ingestedVideos,
-      pattern: routingKeys.videoIngested,
+      queueName: queueNames.downloadedVideos,
+      pattern: routingKeys.videoDownloaded,
       dlqMessageTtl: this.config.amqp.messageTtl,
     });
 
     await this.amqpProvisioner.createQueue({
       channel: this.amqpChannel,
       exchangeName,
-      queueName: queueNames.downloadedVideos,
-      pattern: routingKeys.videoDownloaded,
+      queueName: queueNames.encodingRequests,
+      pattern: routingKeys.videoEncodingRequested,
       dlqMessageTtl: this.config.amqp.messageTtl,
     });
   }

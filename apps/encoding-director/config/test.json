@@ -1,0 +1,5 @@
+{
+  "amqp": {
+    "url": "amqp://test:test@localhost:5672"
+  }
+}

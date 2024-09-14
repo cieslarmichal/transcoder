@@ -1,14 +1,13 @@
 import { type ConsumePayload, type MessageConsumer } from '@common/amqp';
-import { type VideoIngestedMessage } from '@common/contracts';
-import { type DownloadVideoAction } from '../../actions/downloadVideoAction.ts/downloadVideoAction.js';
+import { type DownloadVideoAction } from '../../actions/downloadVideoAction/downloadVideoAction.js';
+import { Value } from '@sinclair/typebox/value';
+import { videoIngestedMessageSchema } from '@common/contracts';
 
-export class VideoIngestedMessageHandler implements MessageConsumer<VideoIngestedMessage> {
+export class VideoIngestedMessageConsumer implements MessageConsumer {
   public constructor(private readonly downloadVideoAction: DownloadVideoAction) {}
 
-  public async consume(payload: ConsumePayload<VideoIngestedMessage>): Promise<void> {
-    const {
-      message: { downloadUrl, videoId },
-    } = payload;
+  public async consume(payload: ConsumePayload): Promise<void> {
+    const { downloadUrl, videoId } = Value.Decode(videoIngestedMessageSchema, payload.message);
 
     await this.downloadVideoAction.execute({
       downloadUrl,
