@@ -8,6 +8,12 @@ import { LogLevel } from '@common/logger';
 const configSchema = Type.Object({
   appName: Type.String({ minLength: 1 }),
   logLevel: Type.Enum(LogLevel),
+  sharedDirectory: Type.String({ minLength: 1 }),
+  amqp: Type.Object({
+    url: Type.String({ minLength: 1 }),
+    redeliveryDropThreshold: Type.Number({ minimum: 1 }),
+    messageTtl: Type.Number({ minimum: 1 }),
+  }),
 });
 
 export type Config = Static<typeof configSchema>;

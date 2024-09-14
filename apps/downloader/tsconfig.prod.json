@@ -10,6 +10,9 @@
   ],
   "references": [
     {
+      "path": "../../common/amqp/tsconfig.json"
+    },
+    {
       "path": "../../common/contracts/tsconfig.json"
     },
     {
@@ -18,8 +21,5 @@
     {
       "path": "../../common/logger/tsconfig.json"
     },
-    {
-      "path": "../../common/s3/tsconfig.json"
-    }
   ]
 }

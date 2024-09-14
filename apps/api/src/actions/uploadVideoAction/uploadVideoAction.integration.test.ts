@@ -15,6 +15,7 @@ import { type GetMessage, type Channel, type Connection } from 'amqplib';
 import { AmqpProvisioner } from '@common/amqp';
 import { exchangeName, queueNames, routingKeys, bucketNames } from '@common/contracts';
 import { OperationNotValidError } from '@common/errors';
+import { type RedisClient, RedisClientFactory } from '@common/redis';
 
 describe('UploadVideoAction', () => {
   let action: UploadVideoAction;
@@ -26,6 +27,8 @@ describe('UploadVideoAction', () => {
   let amqpConnection: Connection;
 
   let amqpChannel: Channel;
+
+  let redisClient: RedisClient;
 
   const resourcesDirectory = resolve(__dirname, '../../../../../resources');
 
@@ -71,11 +74,15 @@ describe('UploadVideoAction', () => {
 
     s3TestUtils = new S3TestUtils(s3Client);
 
-    action = new UploadVideoAction(amqpChannel, s3Service, uuidService, logger);
+    redisClient = new RedisClientFactory(logger).create(config.redis);
+
+    action = new UploadVideoAction(amqpChannel, s3Service, redisClient, uuidService, logger);
 
     await s3TestUtils.createBucket(bucketNames.ingestedVideos);
 
     await amqpChannel.purgeQueue(queueNames.ingestedVideos);
+
+    await redisClient.flushall();
   });
 
   afterEach(async () => {
@@ -84,6 +91,8 @@ describe('UploadVideoAction', () => {
     await amqpChannel.purgeQueue(queueNames.ingestedVideos);
 
     await amqpConnection.close();
+
+    await redisClient.flushall();
   });
 
   it('uploads a video', async () => {
@@ -124,6 +133,12 @@ describe('UploadVideoAction', () => {
     expect(parsedMessage.downloadUrl).toContain(blobName);
 
     expect(parsedMessage.userEmail).toEqual(userEmail);
+
+    const redisKey = `${videoId}-notification-email`;
+
+    const notificationEmail = await redisClient.get(redisKey);
+
+    expect(notificationEmail).toEqual(userEmail);
   });
 
   it('throws an error if the file has no extension', async () => {

@@ -2,17 +2,13 @@ import { type Channel, type Message } from 'amqplib';
 import { type MessageConsumer } from './messageConsumer.js';
 import { type Logger } from '@common/logger';
 
-export interface MessageConsumerExecutorConfig {
-  readonly queueName: string;
-  readonly redeliveryDropThreshold: number;
-}
-
 export class MessageConsumerExecutor {
   public constructor(
     private readonly messageConsumer: MessageConsumer,
     private readonly channel: Channel,
     private readonly logger: Logger,
-    private readonly config: MessageConsumerExecutorConfig,
+    private readonly queueName: string,
+    private readonly redeliveryDropThreshold: number,
   ) {}
 
   public async startConsuming(): Promise<void> {
@@ -39,7 +35,7 @@ export class MessageConsumerExecutor {
 
         this.logger.debug({ message: 'Message consumed.', routingKey, messageOptions, parsedMessage });
       } catch (error) {
-        const redeliveryDropThreshold = this.config.redeliveryDropThreshold;
+        const redeliveryDropThreshold = this.redeliveryDropThreshold;
 
         const dropMessage = message.properties.headers?.['x-death']?.find(
           ({ count, reason }) => reason === 'rejected' && count > redeliveryDropThreshold,
@@ -65,6 +61,6 @@ export class MessageConsumerExecutor {
       }
     };
 
-    await this.channel.consume(this.config.queueName, consumerWrapper);
+    await this.channel.consume(this.queueName, consumerWrapper);
   }
 }

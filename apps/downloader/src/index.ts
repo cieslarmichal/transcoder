@@ -1,29 +1,26 @@
 import { BaseError } from '@common/errors';
-import { LoggerFactory } from '@common/logger';
 
-import { ConfigFactory } from './config.js';
+import { Application } from './application.js';
 
 const finalErrorHandler = async (error: unknown): Promise<void> => {
-  let errorContext;
+  let formattedError = error;
 
   if (error instanceof Error) {
-    errorContext = {
+    formattedError = {
       name: error.name,
       message: error.message,
       ...(error instanceof BaseError ? { ...error.context } : undefined),
     };
-  } else {
-    errorContext = error;
   }
 
   console.error(
     JSON.stringify({
       message: 'Application error.',
-      context: errorContext,
+      context: formattedError,
     }),
   );
 
-  process.exit(1);
+  process.exitCode = 1;
 };
 
 process.on('unhandledRejection', finalErrorHandler);
@@ -34,17 +31,12 @@ process.on('SIGINT', finalErrorHandler);
 
 process.on('SIGTERM', finalErrorHandler);
 
+let application: Application | undefined;
+
 try {
-  const config = ConfigFactory.create();
+  application = new Application();
 
-  const logger = LoggerFactory.create({
-    appName: config.appName,
-    logLevel: config.logLevel,
-  });
-
-  logger.info({
-    message: 'Application started.',
-  });
+  await application.start();
 } catch (error) {
   await finalErrorHandler(error);
 }

@@ -25,7 +25,6 @@ const configSchema = Type.Object({
   }),
   amqp: Type.Object({
     url: Type.String({ minLength: 1 }),
-    redeliveryDropThreshold: Type.Number({ minimum: 1 }),
     messageTtl: Type.Number({ minimum: 1 }),
   }),
   redis: Type.Object({
