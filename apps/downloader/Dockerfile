@@ -1,7 +1,6 @@
 FROM node:20.17.0-alpine AS base
 
 RUN apk update
-RUN apk add --no-cache libc6-compat bash
 
 WORKDIR /app
 
