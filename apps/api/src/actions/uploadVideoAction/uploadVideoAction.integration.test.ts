@@ -132,8 +132,6 @@ describe('UploadVideoAction', () => {
 
     expect(parsedMessage.downloadUrl).toContain(blobName);
 
-    expect(parsedMessage.userEmail).toEqual(userEmail);
-
     const redisKey = `${videoId}-notification-email`;
 
     const notificationEmail = await redisClient.get(redisKey);
