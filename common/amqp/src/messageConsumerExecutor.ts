@@ -62,5 +62,7 @@ export class MessageConsumerExecutor {
     };
 
     await this.channel.consume(this.queueName, consumerWrapper);
+
+    this.logger.info({ message: 'Message consumer started.', queueName: this.queueName });
   }
 }

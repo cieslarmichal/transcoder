@@ -51,6 +51,8 @@ RUN rm -rf ./common/.temp
 
 RUN npm ci
 
+RUN mkdir -p /shared && chmod -R 777 /shared
+
 USER node
 
 CMD node apps/downloader/src/index.js

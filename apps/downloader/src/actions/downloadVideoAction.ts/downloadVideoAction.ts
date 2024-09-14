@@ -24,7 +24,6 @@ export class DownloadVideoAction {
     this.logger.debug({
       message: 'Downloading video...',
       videoId,
-      downloadUrl,
       outputPath,
     });
 
