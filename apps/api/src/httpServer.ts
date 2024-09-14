@@ -19,7 +19,7 @@ import { type Config } from './config.js';
 import { HttpRouter } from './httpRouter.js';
 
 export class HttpServer {
-  public readonly fastifyServer: FastifyInstance;
+  private readonly fastifyServer: FastifyInstance;
   private readonly httpRouter: HttpRouter;
 
   public constructor(
