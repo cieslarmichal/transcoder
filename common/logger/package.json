@@ -16,7 +16,7 @@
     "build:dev": "tsc --build tsconfig.json"
   },
   "dependencies": {
-    "pino": "9.1.0"
+    "pino": "9.4.0"
   },
   "volta": {
     "node": "20.17.0",
