@@ -96,28 +96,35 @@ flowchart LR
 
 ### API Service
 
-- Accepts a file from a user
-- Uploads a file to S3
-- Sends a message with encoding formats and file URL to RabbitMQ
+- Accepts a video from a user by HTTP
+- Uploads a video to S3
+- Sends a message with video id and download to RabbitMQ
 - Checks the encoding progress in Redis
+- Checks the encoding artifacts in S3
 
 ### Downloader Service
 
-- Consumes messages with file URL to download from RabbitMQ
-- Downloads a file from S3 and saves it to the shared volume
+- Consumes messages with video URL to download from RabbitMQ
+- Downloads a video from S3 and saves it to the shared volume
 - Sends a downloading done message to RabbitMQ
+
+### Encoding Director Service
+
+- Consumes messages with video id from RabbitMQ
+- Decides the encoding profile for the video
+- Sends encoding request messages to RabbitMQ (one for each encoding profile)
 
 ### Encoder Service
 
-- Consumes messages with encoding format and file URL from RabbitMQ
-- Encodes a file to the desired format
+- Consumes messages with encoding format and video path from RabbitMQ
+- Encodes a video to the desired format
 - Saves the encoding progress to Redis
 - Sends an encoding done message to RabbitMQ
 
 ### Uploader Service
 
 - Consumes messages about downloading done from RabbitMQ
-- Uploads encoded files from shared volume to S3
+- Uploads encoding artifacts from shared volume to S3
 - Sends an uploading done message to RabbitMQ
 
 ### Notifier Service
