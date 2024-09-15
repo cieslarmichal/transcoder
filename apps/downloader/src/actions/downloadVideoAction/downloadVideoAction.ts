@@ -10,7 +10,7 @@ import { type AmqpChannel } from '@common/amqp';
 
 export interface DownloadVideoActionPayload {
   readonly videoId: string;
-  readonly downloadUrl: string;
+  readonly videoUrl: string;
 }
 
 export class DownloadVideoAction {
@@ -44,7 +44,7 @@ export class DownloadVideoAction {
   ) {}
 
   public async execute(payload: DownloadVideoActionPayload): Promise<void> {
-    const { videoId, downloadUrl } = payload;
+    const { videoId, videoUrl } = payload;
 
     this.logger.debug({
       message: 'Downloading video...',
@@ -52,7 +52,7 @@ export class DownloadVideoAction {
     });
 
     const response = await axios({
-      url: downloadUrl,
+      url: videoUrl,
       method: 'GET',
       responseType: 'stream',
     });

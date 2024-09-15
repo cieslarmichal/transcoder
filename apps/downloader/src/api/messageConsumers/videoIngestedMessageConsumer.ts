@@ -7,10 +7,10 @@ export class VideoIngestedMessageConsumer implements MessageConsumer {
   public constructor(private readonly downloadVideoAction: DownloadVideoAction) {}
 
   public async consume(payload: ConsumePayload): Promise<void> {
-    const { downloadUrl, videoId } = Value.Decode(videoIngestedMessageSchema, payload.message);
+    const { videoUrl, videoId } = Value.Decode(videoIngestedMessageSchema, payload.message);
 
     await this.downloadVideoAction.execute({
-      downloadUrl,
+      videoUrl,
       videoId,
     });
   }

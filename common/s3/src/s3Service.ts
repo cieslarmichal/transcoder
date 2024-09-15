@@ -21,6 +21,10 @@ export interface UploadBlobPayload {
   readonly contentType: string;
 }
 
+export interface UploadBlobResult {
+  readonly location: string;
+}
+
 export interface GetBlobUrlPayload {
   readonly blobName: string;
   readonly bucketName: string;
@@ -48,7 +52,7 @@ export interface GetBlobNamesPayload {
 export class S3Service {
   public constructor(private readonly s3Client: S3Client) {}
 
-  public async uploadBlob(payload: UploadBlobPayload): Promise<void> {
+  public async uploadBlob(payload: UploadBlobPayload): Promise<UploadBlobResult> {
     const { bucketName, blobName, data, contentType, sourceName } = payload;
 
     const attachmentFileName = sourceName ? sourceName : blobName;
@@ -61,10 +65,13 @@ export class S3Service {
         Body: data,
         ContentType: contentType,
         ContentDisposition: `attachment; filename=${attachmentFileName}`,
+        ACL: 'public-read',
       },
     });
 
-    await upload.done();
+    const { Location } = await upload.done();
+
+    return { location: Location as string };
   }
 
   public async getBlobUrl(payload: GetBlobUrlPayload): Promise<string> {

@@ -8,7 +8,11 @@
   "aws": {
     "accessKeyId": null,
     "secretAccessKey": null,
-    "region": "eu-central-1"
+    "region": "eu-central-1",
+    "s3": {
+      "ingestedVideosBucket": null,
+      "encodingArtifactsBucket": null
+    }
   },
   "amqp": {
     "url": "amqp://test:test@transcoder-rabbitmq:5672",

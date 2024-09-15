@@ -50,11 +50,12 @@ export class Application {
       this.redisClient,
       uuidService,
       this.logger,
+      this.config,
     );
 
     const getVideoEncodingProgressAction = new GetVideoEncodingProgressAction(this.redisClient, this.logger);
 
-    const getVideoEncodingArtifactsAction = new GetVideoEncodingArtifactsAction(s3Service, this.logger);
+    const getVideoEncodingArtifactsAction = new GetVideoEncodingArtifactsAction(s3Service, this.logger, this.config);
 
     const videoHttpController = new VideoHttpController(
       uploadVideoAction,

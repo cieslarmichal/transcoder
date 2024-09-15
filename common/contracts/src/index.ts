@@ -9,5 +9,3 @@ export * from './amqp/messages/videoIngestedMessage.js';
 export * from './amqp/messages/videoDownloadedMessage.js';
 
 export * from './amqp/messages/videoEncodingRequestedMessage.js';
-
-export * from './s3.js';

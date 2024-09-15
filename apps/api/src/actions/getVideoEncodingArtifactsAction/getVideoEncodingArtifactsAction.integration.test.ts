@@ -7,7 +7,6 @@ import { ConfigFactory, type Config } from '../../config.js';
 import { GetVideoEncodingArtifactsAction } from './getVideoEncodingArtifactsAction.js';
 import { S3ClientFactory, S3Service } from '@common/s3';
 import { S3TestUtils } from '@common/s3/tests';
-import { bucketNames } from '@common/contracts';
 import { join, resolve } from 'node:path';
 
 describe('GetVideoEncodingArtifactsAction', () => {
@@ -33,15 +32,15 @@ describe('GetVideoEncodingArtifactsAction', () => {
 
     const s3Service = new S3Service(s3Client);
 
-    action = new GetVideoEncodingArtifactsAction(s3Service, logger);
+    action = new GetVideoEncodingArtifactsAction(s3Service, logger, config);
 
     s3TestUtils = new S3TestUtils(s3Client);
 
-    await s3TestUtils.createBucket(bucketNames.encodingArtifacts);
+    await s3TestUtils.createBucket(config.aws.s3.encodingArtifactsBucket);
   });
 
   afterEach(async () => {
-    await s3TestUtils.deleteBucket(bucketNames.encodingArtifacts);
+    await s3TestUtils.deleteBucket(config.aws.s3.encodingArtifactsBucket);
   });
 
   it('gets video encoding artifacts', async () => {
@@ -56,21 +55,21 @@ describe('GetVideoEncodingArtifactsAction', () => {
     const contentType = 'video/mp4';
 
     await s3TestUtils.uploadObject(
-      bucketNames.encodingArtifacts,
+      config.aws.s3.encodingArtifactsBucket,
       encoded360pBlobName,
       join(resourcesDirectory, sampleFileName),
       contentType,
     );
 
     await s3TestUtils.uploadObject(
-      bucketNames.encodingArtifacts,
+      config.aws.s3.encodingArtifactsBucket,
       encodedPreviewBlobName,
       join(resourcesDirectory, sampleFileName),
       contentType,
     );
 
     await s3TestUtils.uploadObject(
-      bucketNames.encodingArtifacts,
+      config.aws.s3.encodingArtifactsBucket,
       encodedPreview360pBlobName,
       join(resourcesDirectory, sampleFileName),
       contentType,
@@ -79,7 +78,7 @@ describe('GetVideoEncodingArtifactsAction', () => {
     const { encodingArtifacts } = await action.execute({ videoId });
 
     encodingArtifacts.every((artifact) => {
-      expect(artifact.url).toContain(bucketNames.encodingArtifacts);
+      expect(artifact.url).toContain(config.aws.s3.encodingArtifactsBucket);
 
       expect(artifact.url).toContain(videoId);
 

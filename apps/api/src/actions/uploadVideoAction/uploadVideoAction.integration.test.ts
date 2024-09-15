@@ -11,7 +11,7 @@ import { UploadVideoAction } from './uploadVideoAction.js';
 import { type UuidService } from '../../common/uuid/uuidService.js';
 import { ConfigFactory, type Config } from '../../config.js';
 import { AmqpProvisioner, type AmqpChannel, type AmqpConnection, type AmqpGetMessageResult } from '@common/amqp';
-import { exchangeName, queueNames, routingKeys, bucketNames } from '@common/contracts';
+import { exchangeName, queueNames, routingKeys } from '@common/contracts';
 import { OperationNotValidError } from '@common/errors';
 import { type RedisClient, RedisClientFactory } from '@common/redis';
 
@@ -74,9 +74,9 @@ describe('UploadVideoAction', () => {
 
     redisClient = new RedisClientFactory(logger).create(config.redis);
 
-    action = new UploadVideoAction(amqpChannel, s3Service, redisClient, uuidService, logger);
+    action = new UploadVideoAction(amqpChannel, s3Service, redisClient, uuidService, logger, config);
 
-    await s3TestUtils.createBucket(bucketNames.ingestedVideos);
+    await s3TestUtils.createBucket(config.aws.s3.ingestedVideosBucket);
 
     await amqpChannel.purgeQueue(queueNames.ingestedVideos);
 
@@ -84,7 +84,7 @@ describe('UploadVideoAction', () => {
   });
 
   afterEach(async () => {
-    await s3TestUtils.deleteBucket(bucketNames.ingestedVideos);
+    await s3TestUtils.deleteBucket(config.aws.s3.ingestedVideosBucket);
 
     await amqpChannel.purgeQueue(queueNames.ingestedVideos);
 
@@ -98,7 +98,7 @@ describe('UploadVideoAction', () => {
 
     const blobName = `${videoId}/source`;
 
-    const existsBefore = await s3TestUtils.objectExists(bucketNames.ingestedVideos, blobName);
+    const existsBefore = await s3TestUtils.objectExists(config.aws.s3.ingestedVideosBucket, blobName);
 
     expect(existsBefore).toBe(false);
 
@@ -108,15 +108,15 @@ describe('UploadVideoAction', () => {
       userEmail,
     });
 
-    const existsAfter = await s3TestUtils.objectExists(bucketNames.ingestedVideos, blobName);
+    const existsAfter = await s3TestUtils.objectExists(config.aws.s3.ingestedVideosBucket, blobName);
 
     expect(existsAfter).toBe(true);
 
     expect(result.videoId).toEqual(videoId);
 
-    expect(result.downloadUrl).toContain(bucketNames.ingestedVideos);
+    expect(result.videoUrl).toContain(config.aws.s3.ingestedVideosBucket);
 
-    expect(result.downloadUrl).toContain(blobName);
+    expect(result.videoUrl).toContain(blobName);
 
     const message = (await amqpChannel.get(queueNames.ingestedVideos)) as AmqpGetMessageResult;
 
@@ -126,9 +126,9 @@ describe('UploadVideoAction', () => {
 
     expect(parsedMessage.videoId).toEqual(videoId);
 
-    expect(parsedMessage.downloadUrl).toContain(bucketNames.ingestedVideos);
+    expect(parsedMessage.videoUrl).toContain(config.aws.s3.ingestedVideosBucket);
 
-    expect(parsedMessage.downloadUrl).toContain(blobName);
+    expect(parsedMessage.videoUrl).toContain(blobName);
 
     const redisKey = `${videoId}-notification-email`;
 

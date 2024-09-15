@@ -6,10 +6,11 @@ import { type Logger } from '@common/logger';
 import { type S3Service } from '@common/s3';
 
 import { type UuidService } from '../../common/uuid/uuidService.js';
-import { bucketNames, exchangeName, routingKeys, type VideoIngestedMessage } from '@common/contracts';
+import { exchangeName, routingKeys, type VideoIngestedMessage } from '@common/contracts';
 import { OperationNotValidError } from '@common/errors';
 import { type RedisClient } from '@common/redis';
 import { type AmqpChannel } from '@common/amqp';
+import { type Config } from '../../config.js';
 
 export interface UploadVideoActionPayload {
   readonly fileName: string;
@@ -19,7 +20,7 @@ export interface UploadVideoActionPayload {
 
 export interface UploadVideoActionResult {
   readonly videoId: string;
-  readonly downloadUrl: string;
+  readonly videoUrl: string;
 }
 
 export class UploadVideoAction {
@@ -53,14 +54,17 @@ export class UploadVideoAction {
     private readonly redisClient: RedisClient,
     private readonly uuidService: UuidService,
     private readonly logger: Logger,
+    private readonly config: Config,
   ) {}
 
   public async execute(payload: UploadVideoActionPayload): Promise<UploadVideoActionResult> {
     const { fileName, data, userEmail } = payload;
 
+    const bucketName = this.config.aws.s3.ingestedVideosBucket;
+
     this.logger.debug({
       message: 'Uploading video...',
-      bucketName: bucketNames.ingestedVideos,
+      bucketName,
       fileName,
       userEmail,
     });
@@ -87,23 +91,18 @@ export class UploadVideoAction {
 
     const blobName = `${videoId}/source`;
 
-    await this.s3Service.uploadBlob({
-      bucketName: bucketNames.ingestedVideos,
+    const { location: videoUrl } = await this.s3Service.uploadBlob({
+      bucketName,
       blobName,
       sourceName: fileName,
       data,
       contentType: videoContentType,
     });
 
-    const downloadUrl = await this.s3Service.getBlobUrl({
-      bucketName: bucketNames.ingestedVideos,
-      blobName,
-    });
-
     this.logger.debug({
       message: 'Video uploaded.',
       blobName,
-      downloadUrl,
+      videoUrl,
     });
 
     const redisKey = `${videoId}-notification-email`;
@@ -112,14 +111,14 @@ export class UploadVideoAction {
 
     const message = {
       videoId,
-      downloadUrl,
+      videoUrl,
     } satisfies VideoIngestedMessage;
 
     this.amqpChannel.publish(exchangeName, routingKeys.videoIngested, Buffer.from(JSON.stringify(message)));
 
     return {
       videoId,
-      downloadUrl,
+      videoUrl,
     };
   }
 }

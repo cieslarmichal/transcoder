@@ -1,6 +1,6 @@
-import { bucketNames } from '@common/contracts';
 import { type Logger } from '@common/logger';
 import { type S3Service } from '@common/s3';
+import { type Config } from '../../config.js';
 
 export interface GetVideoEncodingArtifactsActionPayload {
   readonly videoId: string;
@@ -18,6 +18,7 @@ export class GetVideoEncodingArtifactsAction {
   public constructor(
     private readonly s3Service: S3Service,
     private readonly logger: Logger,
+    private readonly config: Config,
   ) {}
 
   public async execute(
@@ -25,21 +26,23 @@ export class GetVideoEncodingArtifactsAction {
   ): Promise<GetVideoEncodingArtifactsActionResult> {
     const { videoId } = payload;
 
+    const bucketName = this.config.aws.s3.encodingArtifactsBucket;
+
     this.logger.debug({
       message: 'Fetching video encoding artifacts...',
-      bucketName: bucketNames.encodingArtifacts,
+      bucketName,
       videoId,
     });
 
     const encodingArtifacts = await this.s3Service.getBlobsUrls({
-      bucketName: bucketNames.encodingArtifacts,
+      bucketName,
       prefix: videoId,
     });
 
     this.logger.debug({
       message: 'Video encoding artifacts fetched.',
       videoId,
-      bucketName: bucketNames.encodingArtifacts,
+      bucketName,
       count: encodingArtifacts.length,
     });
 
