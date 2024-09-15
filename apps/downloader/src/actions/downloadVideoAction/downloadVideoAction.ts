@@ -57,11 +57,11 @@ export class DownloadVideoAction {
       responseType: 'stream',
     });
 
-    const contentType = response.headers['Content-Type'];
+    const contentType = response.headers['content-type'];
 
     if (!contentType) {
       throw new OperationNotValidError({
-        reason: 'Content-Type header is missing.',
+        reason: 'Missing content-type header.',
         headers: response.headers,
       });
     }
