@@ -39,7 +39,7 @@ export class Application {
       messageConsumer,
       this.amqpChannel as AmqpChannel,
       this.logger,
-      queueNames.ingestedVideos,
+      queueNames.downloadedVideos,
       this.config.amqp.redeliveryDropThreshold,
     );
 
