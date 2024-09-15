@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
 import { type Static, Type } from '@sinclair/typebox';
+import { pathPattern, uuidPattern } from './validationPatterns.js';
 
 export enum EncodingProfile {
   '360p' = '360p',
@@ -16,14 +17,14 @@ export enum EncodingProfile {
 }
 
 export const videoEncodingRequestedMessageSchema = Type.Object({
-  videoId: Type.String({ format: 'uuid' }),
-  location: Type.String({ minLength: 1 }),
+  videoId: Type.String({ pattern: uuidPattern }),
+  location: Type.String({ pattern: pathPattern }),
   encodingProfile: Type.Object({
     id: Type.Enum(EncodingProfile),
-    width: Type.Integer(),
-    height: Type.Integer(),
-    bitrate: Type.Integer(),
-    fps: Type.Integer(),
+    width: Type.Integer({ minimum: 1 }),
+    height: Type.Integer({ minimum: 1 }),
+    bitrate: Type.Integer({ minimum: 1 }),
+    fps: Type.Integer({ minimum: 1 }),
   }),
 });
 
