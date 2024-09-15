@@ -62,13 +62,5 @@ export class Application {
       pattern: routingKeys.videoIngested,
       dlqMessageTtl: this.config.amqp.messageTtl,
     });
-
-    await this.amqpProvisioner.createQueue({
-      channel: this.amqpChannel,
-      exchangeName,
-      queueName: queueNames.downloadedVideos,
-      pattern: routingKeys.videoDownloaded,
-      dlqMessageTtl: this.config.amqp.messageTtl,
-    });
   }
 }

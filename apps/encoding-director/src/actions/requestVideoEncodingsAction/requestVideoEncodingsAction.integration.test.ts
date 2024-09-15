@@ -7,6 +7,7 @@ import { RequestVideoEncodingsAction } from './requestVideoEncodingsAction.js';
 import { ConfigFactory, type Config } from '../../config.js';
 import { AmqpProvisioner, type AmqpChannel, type AmqpConnection, type AmqpGetMessageResult } from '@common/amqp';
 import { exchangeName, queueNames, routingKeys, type VideoEncodingRequestedMessage } from '@common/contracts';
+import { VideoContainer } from '../../../../../common/contracts/src/amqp/messages/encodingContainer.js';
 
 describe('RequestVideoEncodingsAction', () => {
   let action: RequestVideoEncodingsAction;
@@ -57,11 +58,14 @@ describe('RequestVideoEncodingsAction', () => {
   it('requests video encodings', async () => {
     const videoId = faker.string.uuid();
 
-    const location = `/shared/${videoId}.mp4`;
+    const videoContainer = VideoContainer.mp4;
+
+    const location = `/shared/${videoId}.${videoContainer}`;
 
     await action.execute({
       videoId,
       location,
+      videoContainer,
     });
 
     for (let i = 0; i < config.encoding.profiles.length; i++) {
@@ -75,7 +79,9 @@ describe('RequestVideoEncodingsAction', () => {
 
       expect(parsedMessage.location).toEqual(location);
 
-      expect(config.encoding.profiles).toContainEqual(parsedMessage.encodingProfile);
+      expect(parsedMessage.videoContainer).toEqual(videoContainer);
+
+      expect(config.encoding.profiles).toContainEqual(parsedMessage.encoding);
     }
   });
 });

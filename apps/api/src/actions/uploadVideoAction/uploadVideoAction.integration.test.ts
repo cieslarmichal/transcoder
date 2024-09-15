@@ -11,7 +11,7 @@ import { UploadVideoAction } from './uploadVideoAction.js';
 import { type UuidService } from '../../common/uuid/uuidService.js';
 import { ConfigFactory, type Config } from '../../config.js';
 import { AmqpProvisioner, type AmqpChannel, type AmqpConnection, type AmqpGetMessageResult } from '@common/amqp';
-import { exchangeName, queueNames, routingKeys } from '@common/contracts';
+import { exchangeName, queueNames, routingKeys, type VideoIngestedMessage } from '@common/contracts';
 import { OperationNotValidError } from '@common/errors';
 import { type RedisClient, RedisClientFactory } from '@common/redis';
 
@@ -122,9 +122,11 @@ describe('UploadVideoAction', () => {
 
     expect(message).not.toBe(false);
 
-    const parsedMessage = JSON.parse(message.content.toString());
+    const parsedMessage = JSON.parse(message.content.toString()) as VideoIngestedMessage;
 
     expect(parsedMessage.videoId).toEqual(videoId);
+
+    expect(parsedMessage.videoContainer).toEqual('mp4');
 
     expect(parsedMessage.videoUrl).toContain(config.aws.s3.ingestedVideosBucket);
 

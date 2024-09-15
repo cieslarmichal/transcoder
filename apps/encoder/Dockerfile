@@ -14,7 +14,7 @@ COPY apps/ ./apps
 COPY common/ ./common
 COPY tsconfig.json ./
 
-RUN turbo prune --scope="@apps/encoding-director" --docker
+RUN turbo prune --scope="@apps/encoder" --docker
 
 FROM base AS installer
 
@@ -26,16 +26,16 @@ RUN npm ci
 
 COPY --from=builder /app/out/full/ .
 
-RUN npm run build --filter="@apps/encoding-director"
+RUN npm run build --filter="@apps/encoder"
 
 FROM base AS runner
 
-ENV NODE_CONFIG_DIR=/app/apps/encoding-director/config
+ENV NODE_CONFIG_DIR=/app/apps/encoder/config
 
 COPY package*.json ./
-COPY --from=installer /app/apps/encoding-director/dist ./apps/encoding-director
-COPY --from=installer /app/apps/encoding-director/config ./apps/encoding-director/config
-COPY --from=installer /app/apps/encoding-director/package.json ./apps/encoding-director/package.json
+COPY --from=installer /app/apps/encoder/dist ./apps/encoder
+COPY --from=installer /app/apps/encoder/config ./apps/encoder/config
+COPY --from=installer /app/apps/encoder/package.json ./apps/encoder/package.json
 
 COPY --from=installer /app/common/ ./common/.temp
 
@@ -50,6 +50,8 @@ RUN rm -rf ./common/.temp
 
 RUN npm ci
 
+RUN mkdir -p /shared && chmod -R 777 /shared
+
 USER node
 
-CMD node apps/encoding-director/src/index.js
+CMD node apps/encoder/src/index.js

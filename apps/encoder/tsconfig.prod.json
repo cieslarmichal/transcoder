@@ -1,0 +1,25 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": [
+    "src/**/tests/**/*",
+    "src/**/*.test.ts"
+  ],
+  "references": [
+    {
+      "path": "../../common/amqp/tsconfig.json"
+    },
+    {
+      "path": "../../common/contracts/tsconfig.json"
+    },
+    {
+      "path": "../../common/errors/tsconfig.json"
+    },
+    {
+      "path": "../../common/logger/tsconfig.json"
+    },
+  ]
+}

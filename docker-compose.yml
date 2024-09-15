@@ -61,5 +61,18 @@ services:
       transcoder-rabbitmq:
         condition: service_healthy
 
+  transcoder-encoder:
+    container_name: transcoder-encoder
+    build:
+      context: .
+      dockerfile: ./apps/encoder/Dockerfile
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      transcoder-rabbitmq:
+        condition: service_healthy
+    volumes:
+      - shared-storage:/shared
+
 volumes:
   shared-storage:

@@ -1,0 +1,6 @@
+{
+  "logLevel": "LOG_LEVEL",
+  "amqp": {
+    "url": "AMQP_URL"
+  }
+}

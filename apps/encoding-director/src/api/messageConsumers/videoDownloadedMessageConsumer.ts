@@ -7,11 +7,12 @@ export class VideoDownloadedMessageConsumer implements MessageConsumer {
   public constructor(private readonly requestVideoEncodingsAction: RequestVideoEncodingsAction) {}
 
   public async consume(payload: ConsumePayload): Promise<void> {
-    const { location, videoId } = Value.Decode(videoDownloadedMessageSchema, payload.message);
+    const { location, videoId, videoContainer } = Value.Decode(videoDownloadedMessageSchema, payload.message);
 
     await this.requestVideoEncodingsAction.execute({
       location,
       videoId,
+      videoContainer,
     });
   }
 }

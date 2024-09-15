@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
-
 import { type Readable } from 'node:stream';
 
 import { type Logger } from '@common/logger';
@@ -11,6 +9,10 @@ import { OperationNotValidError } from '@common/errors';
 import { type RedisClient } from '@common/redis';
 import { type AmqpChannel } from '@common/amqp';
 import { type Config } from '../../config.js';
+import {
+  isVideoContainer,
+  mapVideoContainerToContentType,
+} from '../../../../../common/contracts/src/amqp/messages/encodingContainer.js';
 
 export interface UploadVideoActionPayload {
   readonly fileName: string;
@@ -24,30 +26,6 @@ export interface UploadVideoActionResult {
 }
 
 export class UploadVideoAction {
-  private readonly videoExtensionToContentTypeMapping: Record<string, string> = {
-    mp4: 'video/mp4',
-    mov: 'video/quicktime',
-    avi: 'video/x-msvideo',
-    mkv: 'video/x-matroska',
-    wmv: 'video/x-ms-wmv',
-    flv: 'video/x-flv',
-    webm: 'video/webm',
-    mpeg: 'video/mpeg',
-    mpg: 'video/mpeg',
-    '3gp': 'video/3gpp',
-    ogg: 'video/ogg',
-    ts: 'video/mp2t',
-    m4v: 'video/x-m4v',
-    m2ts: 'video/MP2T',
-    vob: 'video/dvd',
-    rm: 'application/vnd.rn-realmedia',
-    rmvb: 'application/vnd.rn-realmedia-vbr',
-    divx: 'video/divx',
-    asf: 'video/x-ms-asf',
-    swf: 'application/x-shockwave-flash',
-    f4v: 'video/x-f4v',
-  };
-
   public constructor(
     private readonly amqpChannel: AmqpChannel,
     private readonly s3Service: S3Service,
@@ -78,7 +56,14 @@ export class UploadVideoAction {
       });
     }
 
-    const videoContentType = this.videoExtensionToContentTypeMapping[fileExtension];
+    if (!isVideoContainer(fileExtension)) {
+      throw new OperationNotValidError({
+        reason: 'File is not a video.',
+        fileName,
+      });
+    }
+
+    const videoContentType = mapVideoContainerToContentType(fileExtension);
 
     if (!videoContentType) {
       throw new OperationNotValidError({
@@ -112,6 +97,7 @@ export class UploadVideoAction {
     const message = {
       videoId,
       videoUrl,
+      videoContainer: fileExtension,
     } satisfies VideoIngestedMessage;
 
     this.amqpChannel.publish(exchangeName, routingKeys.videoIngested, Buffer.from(JSON.stringify(message)));

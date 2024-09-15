@@ -4,28 +4,15 @@ import config from 'config';
 
 import { ConfigurationError } from '@common/errors';
 import { LogLevel } from '@common/logger';
-import { EncodingId } from '@common/contracts';
-import { EncodingContainer } from '../../../common/contracts/src/amqp/messages/encodingContainer.js';
 
 const configSchema = Type.Object({
   appName: Type.String({ minLength: 1 }),
   logLevel: Type.Enum(LogLevel),
+  sharedDirectory: Type.String({ minLength: 1 }),
   amqp: Type.Object({
     url: Type.String({ minLength: 1 }),
     redeliveryDropThreshold: Type.Number({ minimum: 1 }),
     messageTtl: Type.Number({ minimum: 1 }),
-  }),
-  encoding: Type.Object({
-    profiles: Type.Array(
-      Type.Object({
-        id: Type.Enum(EncodingId),
-        container: Type.Enum(EncodingContainer),
-        width: Type.Integer(),
-        height: Type.Integer(),
-        bitrate: Type.Integer(),
-        fps: Type.Integer(),
-      }),
-    ),
   }),
 });
 
