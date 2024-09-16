@@ -4,8 +4,7 @@ import config from 'config';
 
 import { ConfigurationError } from '@common/errors';
 import { LogLevel } from '@common/logger';
-import { EncodingId } from '@common/contracts';
-import { EncodingContainer } from '../../../common/contracts/src/amqp/messages/encodingContainer.js';
+import { EncodingId, EncodingContainer } from '@common/contracts';
 
 const configSchema = Type.Object({
   appName: Type.String({ minLength: 1 }),

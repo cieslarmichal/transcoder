@@ -4,15 +4,17 @@ import { type Logger } from '@common/logger';
 import { type S3Service } from '@common/s3';
 
 import { type UuidService } from '../../common/uuid/uuidService.js';
-import { exchangeName, routingKeys, type VideoIngestedMessage } from '@common/contracts';
+import {
+  exchangeName,
+  routingKeys,
+  type VideoIngestedMessage,
+  isVideoContainer,
+  mapVideoContainerToContentType,
+} from '@common/contracts';
 import { OperationNotValidError } from '@common/errors';
 import { type RedisClient } from '@common/redis';
 import { type AmqpChannel } from '@common/amqp';
 import { type Config } from '../../config.js';
-import {
-  isVideoContainer,
-  mapVideoContainerToContentType,
-} from '../../../../../common/contracts/src/amqp/messages/encodingContainer.js';
 
 export interface UploadVideoActionPayload {
   readonly fileName: string;
@@ -74,7 +76,7 @@ export class UploadVideoAction {
 
     const videoId = this.uuidService.generateUuid();
 
-    const blobName = `${videoId}/source`;
+    const blobName = `${videoId}/source.${fileExtension}`;
 
     const { location: videoUrl } = await this.s3Service.uploadBlob({
       bucketName,
@@ -101,11 +103,6 @@ export class UploadVideoAction {
     } satisfies VideoIngestedMessage;
 
     this.amqpChannel.publish(exchangeName, routingKeys.videoIngested, Buffer.from(JSON.stringify(message)));
-
-    this.logger.debug({
-      message: 'Video ingested message sent.',
-      videoId,
-    });
 
     return {
       videoId,

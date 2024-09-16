@@ -19,12 +19,10 @@ export class MessageConsumerExecutor {
 
       const parsedMessage = JSON.parse(message.content.toString());
 
-      const messageOptions = message.properties;
-
       const { routingKey } = message.fields;
 
       try {
-        this.logger.debug({ message: 'Consuming message...', routingKey, messageOptions, parsedMessage });
+        this.logger.debug({ message: 'Consuming message...', routingKey, content: parsedMessage });
 
         await this.messageConsumer.consume({
           message: parsedMessage,
@@ -33,7 +31,7 @@ export class MessageConsumerExecutor {
 
         this.channel.ack(message);
 
-        this.logger.debug({ message: 'Message consumed.', routingKey, messageOptions, parsedMessage });
+        this.logger.debug({ message: 'Message consumed.', routingKey, content: parsedMessage });
       } catch (error) {
         const redeliveryDropThreshold = this.redeliveryDropThreshold;
 
@@ -45,8 +43,7 @@ export class MessageConsumerExecutor {
           this.logger.error({
             message: 'Message dropped due to redelivery count threshold exceeded.',
             routingKey,
-            messageOptions,
-            parsedMessage,
+            content: parsedMessage,
             error,
           });
 

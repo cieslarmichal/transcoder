@@ -70,10 +70,5 @@ export class DownloadVideoAction {
     } satisfies VideoDownloadedMessage;
 
     this.amqpChannel.publish(exchangeName, routingKeys.videoDownloaded, Buffer.from(JSON.stringify(message)));
-
-    this.logger.debug({
-      message: 'Video downloaded message sent.',
-      videoId,
-    });
   }
 }

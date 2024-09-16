@@ -8,7 +8,6 @@ import { VideoHttpController } from './api/httpControllers/videoHttpController/v
 import { UuidService } from './common/uuid/uuidService.js';
 import { type Config, ConfigFactory } from './config.js';
 import { HttpServer } from './httpServer.js';
-import { exchangeName, queueNames, routingKeys } from '@common/contracts';
 import { RedisClientFactory, type RedisClient } from '@common/redis';
 import { GetVideoEncodingProgressAction } from './actions/getVideoEncodingProgressAction/getVideoEncodingProgressAction.js';
 import { GetVideoEncodingArtifactsAction } from './actions/getVideoEncodingArtifactsAction/getVideoEncodingArtifactsAction.js';
@@ -85,14 +84,6 @@ export class Application {
 
     this.amqpChannel = await this.amqpProvisioner.createChannel({
       connection: this.amqpConnection,
-    });
-
-    await this.amqpProvisioner.createQueue({
-      channel: this.amqpChannel,
-      exchangeName,
-      queueName: queueNames.ingestedVideos,
-      pattern: routingKeys.videoIngested,
-      dlqMessageTtl: this.config.amqp.messageTtl,
     });
   }
 }

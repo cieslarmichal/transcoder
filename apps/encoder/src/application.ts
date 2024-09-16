@@ -3,8 +3,8 @@ import { type Logger, LoggerFactory } from '@common/logger';
 
 import { type Config, ConfigFactory } from './config.js';
 import { exchangeName, queueNames, routingKeys } from '@common/contracts';
-import { VideoIngestedMessageConsumer } from './api/messageConsumers/videoEncodingRequestedMessageConsumer.js';
-import { DownloadVideoAction } from './actions/encodeVideoAction/encodeVideoAction.js';
+import { EncodeVideoAction } from './actions/encodeVideoAction/encodeVideoAction.js';
+import { VideoEncodingRequestedMessageConsumer } from './api/messageConsumers/videoEncodingRequestedMessageConsumer.js';
 
 export class Application {
   private readonly config: Config;
@@ -27,9 +27,9 @@ export class Application {
   public async start(): Promise<void> {
     await this.setupAmqp();
 
-    const downloadVideoAction = new DownloadVideoAction(this.amqpChannel as AmqpChannel, this.logger, this.config);
+    const encodeVideoAction = new EncodeVideoAction(this.amqpChannel as AmqpChannel, this.logger, this.config);
 
-    const messageConsumer = new VideoIngestedMessageConsumer(downloadVideoAction);
+    const messageConsumer = new VideoEncodingRequestedMessageConsumer(encodeVideoAction);
 
     const messageConsumerExecutor = new MessageConsumerExecutor(
       messageConsumer,

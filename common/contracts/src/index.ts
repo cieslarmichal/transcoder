@@ -13,3 +13,5 @@ export * from './amqp/messages/videoEncodingRequestedMessage.js';
 export * from './amqp/messages/videoEncodedMessage.js';
 
 export * from './amqp/messages/encodingId.js';
+
+export * from './amqp/messages/encodingContainer.js';

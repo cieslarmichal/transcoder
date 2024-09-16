@@ -1,11 +1,14 @@
 import { type Logger } from '@common/logger';
 import { type Config } from '../../config.js';
-import { EncodingId, exchangeName, routingKeys, type VideoEncodedMessage } from '@common/contracts';
-import { type AmqpChannel } from '@common/amqp';
 import {
+  EncodingId,
+  exchangeName,
+  routingKeys,
+  type VideoEncodedMessage,
   type EncodingContainer,
   type VideoContainer,
-} from '../../../../../common/contracts/src/amqp/messages/encodingContainer.js';
+} from '@common/contracts';
+import { type AmqpChannel } from '@common/amqp';
 import ffmpegPath from 'ffmpeg-static';
 import ffmpeg from 'fluent-ffmpeg';
 
