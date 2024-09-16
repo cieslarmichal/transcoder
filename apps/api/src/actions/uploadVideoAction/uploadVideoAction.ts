@@ -102,6 +102,11 @@ export class UploadVideoAction {
 
     this.amqpChannel.publish(exchangeName, routingKeys.videoIngested, Buffer.from(JSON.stringify(message)));
 
+    this.logger.debug({
+      message: 'Video ingested message sent.',
+      videoId,
+    });
+
     return {
       videoId,
       videoUrl,

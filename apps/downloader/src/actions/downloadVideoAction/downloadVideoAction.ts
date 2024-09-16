@@ -57,6 +57,12 @@ export class DownloadVideoAction {
       writer.on('error', reject);
     });
 
+    this.logger.info({
+      message: 'Video downloaded.',
+      videoId,
+      outputPath,
+    });
+
     const message = {
       videoId,
       location: outputPath,
@@ -65,10 +71,9 @@ export class DownloadVideoAction {
 
     this.amqpChannel.publish(exchangeName, routingKeys.videoDownloaded, Buffer.from(JSON.stringify(message)));
 
-    this.logger.info({
-      message: 'Video downloaded.',
+    this.logger.debug({
+      message: 'Video downloaded message sent.',
       videoId,
-      outputPath,
     });
   }
 }
