@@ -5,6 +5,6 @@
   "amqp": {
     "url": "amqp://test:test@transcoder-rabbitmq:5672",
     "redeliveryDropThreshold": 5,
-    "messageTtl": 60000
+    "messageTtl": 30000
   }
 }

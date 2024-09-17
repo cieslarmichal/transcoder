@@ -16,7 +16,7 @@
   },
   "amqp": {
     "url": "amqp://test:test@transcoder-rabbitmq:5672",
-    "messageTtl": 60000
+    "messageTtl": 30000
   },
   "redis": {
     "host": "transcoder-redis",
