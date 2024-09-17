@@ -95,14 +95,14 @@ export class EncodeVideoAction {
         ffmpeg()
           .setFfmpegPath(ffmpegPath as unknown as string)
           .input(location)
-          .outputOptions(['-y', '-vf', 'fps=1/10', '-frames:v 800'])
+          .outputOptions(['-y', '-vf', 'fps=1/10,scale=320:240', '-frames:v 800'])
           .output(tempPattern)
           .on('end', async () => {
             await new Promise((resolveCombine, rejectCombine) => {
               ffmpeg()
                 .setFfmpegPath(ffmpegPath as unknown as string)
                 .input(tempPattern)
-                .outputOptions(['-y', '-filter_complex', 'tile=5x5'])
+                .outputOptions(['-y', '-filter_complex', 'tile=20x40'])
                 .output(outputPath)
                 .on('end', resolveCombine)
                 .on('error', rejectCombine)
