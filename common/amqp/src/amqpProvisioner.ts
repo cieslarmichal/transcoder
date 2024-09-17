@@ -71,9 +71,13 @@ export class AmqpProvisioner {
 
     const retryExchangeName = `${exchangeName}.retry`;
 
+    const dlqExchangeName = `${exchangeName}.dlq`;
+
     await channel.assertExchange(exchangeName, 'topic');
 
     await channel.assertExchange(retryExchangeName, 'topic');
+
+    await channel.assertExchange(dlqExchangeName, 'topic');
 
     await channel.assertQueue(queueName, {
       deadLetterExchange: retryExchangeName,
@@ -81,12 +85,16 @@ export class AmqpProvisioner {
     });
 
     await channel.assertQueue(`${queueName}.retry`, {
-      deadLetterExchange: retryExchangeName,
+      deadLetterExchange: dlqExchangeName,
       messageTtl: dlqMessageTtl,
     });
+
+    await channel.assertQueue(`${queueName}.dlq`);
 
     await channel.bindQueue(queueName, exchangeName, pattern);
 
     await channel.bindQueue(`${queueName}.retry`, retryExchangeName, pattern);
+
+    await channel.bindQueue(`${queueName}.dlq`, dlqExchangeName, pattern);
   }
 }
