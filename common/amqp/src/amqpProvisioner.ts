@@ -77,17 +77,15 @@ export class AmqpProvisioner {
 
     await channel.assertQueue(queueName, {
       deadLetterExchange: retryExchangeName,
-      deadLetterRoutingKey: `${queueName}.retry`,
     });
 
     await channel.assertQueue(`${queueName}.retry`, {
       deadLetterExchange: exchangeName,
-      deadLetterRoutingKey: queueName,
       messageTtl: dlqMessageTtl,
     });
 
     await channel.bindQueue(queueName, exchangeName, pattern);
 
-    await channel.bindQueue(`${queueName}.retry`, retryExchangeName, `${queueName}.retry`);
+    await channel.bindQueue(`${queueName}.retry`, retryExchangeName, pattern);
   }
 }
