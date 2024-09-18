@@ -39,19 +39,28 @@ export class MessageConsumerExecutor {
           ({ count, reason }) => reason === 'rejected' && count > redeliveryDropThreshold,
         );
 
+        let formattedError = error;
+
+        if (error instanceof Error) {
+          formattedError = {
+            name: error.name,
+            message: error.message,
+          };
+        }
+
         if (dropMessage) {
           this.logger.error({
             message: 'Message dropped due to redelivery count threshold exceeded.',
             routingKey,
             content: parsedMessage,
-            error,
+            error: formattedError,
           });
 
           this.channel.ack(message);
 
           return;
         } else {
-          this.logger.error({ message: 'Error while consuming message.', error });
+          this.logger.error({ message: 'Error while consuming message.', error: formattedError });
 
           this.channel.reject(message, false);
         }
