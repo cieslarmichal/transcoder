@@ -18,3 +18,5 @@ export const videoEncodingRequestedMessageSchema = Type.Object({
 });
 
 export type VideoEncodingRequestedMessage = Static<typeof videoEncodingRequestedMessageSchema>;
+
+export type EncodingSpecification = VideoEncodingRequestedMessage['encoding'];

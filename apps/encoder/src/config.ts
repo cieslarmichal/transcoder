@@ -14,6 +14,13 @@ const configSchema = Type.Object({
     redeliveryDropThreshold: Type.Number({ minimum: 1 }),
     messageTtl: Type.Number({ minimum: 1 }),
   }),
+  redis: Type.Object({
+    host: Type.String({ minLength: 1 }),
+    port: Type.Number({
+      minimum: 1,
+      maximum: 65535,
+    }),
+  }),
 });
 
 export type Config = Static<typeof configSchema>;

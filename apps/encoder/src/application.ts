@@ -5,6 +5,7 @@ import { type Config, ConfigFactory } from './config.js';
 import { exchangeName, queueNames, routingKeys } from '@common/contracts';
 import { EncodeVideoAction } from './actions/encodeVideoAction/encodeVideoAction.js';
 import { VideoEncodingRequestedMessageConsumer } from './api/messageConsumers/videoEncodingRequestedMessageConsumer.js';
+import { type RedisClient, RedisClientFactory } from '@common/redis';
 
 export class Application {
   private readonly config: Config;
@@ -12,6 +13,7 @@ export class Application {
   private amqpConnection: AmqpConnection | undefined;
   private amqpChannel: AmqpChannel | undefined;
   private readonly amqpProvisioner: AmqpProvisioner;
+  private readonly redisClient: RedisClient;
 
   public constructor() {
     this.config = ConfigFactory.create();
@@ -22,12 +24,19 @@ export class Application {
     });
 
     this.amqpProvisioner = new AmqpProvisioner(this.logger);
+
+    this.redisClient = new RedisClientFactory(this.logger).create(this.config.redis);
   }
 
   public async start(): Promise<void> {
     await this.setupAmqp();
 
-    const encodeVideoAction = new EncodeVideoAction(this.amqpChannel as AmqpChannel, this.logger, this.config);
+    const encodeVideoAction = new EncodeVideoAction(
+      this.amqpChannel as AmqpChannel,
+      this.redisClient,
+      this.logger,
+      this.config,
+    );
 
     const messageConsumer = new VideoEncodingRequestedMessageConsumer(encodeVideoAction);
 
@@ -40,10 +49,14 @@ export class Application {
     );
 
     await messageConsumerExecutor.startConsuming();
+
+    await this.redisClient.ping();
   }
 
   public async stop(): Promise<void> {
     await this.amqpConnection?.close();
+
+    await this.redisClient.quit();
   }
 
   private async setupAmqp(): Promise<void> {
