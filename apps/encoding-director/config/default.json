@@ -3,7 +3,7 @@
   "logLevel": "debug",
   "amqp": {
     "url": "amqp://test:test@transcoder-rabbitmq:5672",
-    "redeliveryDropThreshold": 3,
+    "redeliveryDropThreshold": 5,
     "messageTtl": 30000
   },
   "encoding": {
@@ -17,11 +17,67 @@
         "fps": 30
       },
       {
+        "id": "480p",
+        "container": "mp4",
+        "width": 854,
+        "height": 480,
+        "bitrate": 1400,
+        "fps": 30
+      },
+      {
+        "id": "720p",
+        "container": "mp4",
+        "width": 1280,
+        "height": 720,
+        "bitrate": 2800,
+        "fps": 30
+      },
+      {
+        "id": "1080p",
+        "container": "mp4",
+        "width": 1920,
+        "height": 1080,
+        "bitrate": 5000,
+        "fps": 30
+      },
+      {
         "id": "preview",
         "container": "mp4",
         "width": 320,
         "height": 180,
         "bitrate": 400,
+        "fps": 30
+      },
+      {
+        "id": "preview_360p",
+        "container": "mp4",
+        "width": 640,
+        "height": 360,
+        "bitrate": 800,
+        "fps": 30
+      },
+      {
+        "id": "preview_480p",
+        "container": "mp4",
+        "width": 854,
+        "height": 480,
+        "bitrate": 1400,
+        "fps": 30
+      },
+      {
+        "id": "preview_720p",
+        "container": "mp4",
+        "width": 1280,
+        "height": 720,
+        "bitrate": 2800,
+        "fps": 30
+      },
+      {
+        "id": "preview_1080p",
+        "container": "mp4",
+        "width": 1920,
+        "height": 1080,
+        "bitrate": 5000,
         "fps": 30
       },
       {
