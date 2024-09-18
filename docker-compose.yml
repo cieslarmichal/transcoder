@@ -74,5 +74,18 @@ services:
     volumes:
       - shared-storage:/shared
 
+  transcoder-uploader:
+    container_name: transcoder-uploader
+    build:
+      context: .
+      dockerfile: ./apps/uploader/Dockerfile
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      transcoder-rabbitmq:
+        condition: service_healthy
+    volumes:
+      - shared-storage:/shared
+
 volumes:
   shared-storage:
