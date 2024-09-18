@@ -7,12 +7,6 @@ import {
   uploadVideoResponseBodyDtoSchema,
 } from './schemas/uploadVideoSchema.js';
 import { type UploadVideoAction } from '../../../actions/uploadVideoAction/uploadVideoAction.js';
-import { type HttpController } from '../../../common/types/http/httpController.js';
-import { HttpMethodName } from '../../../common/types/http/httpMethodName.js';
-import { type HttpRequest } from '../../../common/types/http/httpRequest.js';
-import { type HttpOkResponse, type HttpCreatedResponse } from '../../../common/types/http/httpResponse.js';
-import { HttpRoute } from '../../../common/types/http/httpRoute.js';
-import { HttpStatusCode } from '../../../common/types/http/httpStatusCode.js';
 import {
   type GetVideoEncodingProgressPathParamsDto,
   getVideoEncodingProgressPathParamsDtoSchema,
@@ -28,6 +22,12 @@ import {
   type GetVideoEncodingArtifactsResponseBodyDto,
 } from './schemas/getVideoEncodingArtifactsSchema.js';
 import { createReadStream } from 'node:fs';
+import { type HttpController } from '../../../common/types/httpController.js';
+import { HttpMethodName } from '../../../common/types/httpMethodName.js';
+import { type HttpRequest } from '../../../common/types/httpRequest.js';
+import { type HttpCreatedResponse, type HttpOkResponse } from '../../../common/types/httpResponse.js';
+import { HttpRoute } from '../../../common/types/httpRoute.js';
+import { HttpStatusCode } from '../../../common/types/httpStatusCode.js';
 
 export class VideoHttpController implements HttpController {
   public readonly basePath = '/videos';

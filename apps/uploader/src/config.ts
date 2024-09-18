@@ -8,34 +8,21 @@ import { AwsRegion } from '@common/s3';
 
 const configSchema = Type.Object({
   appName: Type.String({ minLength: 1 }),
-  server: Type.Object({
-    host: Type.String({ minLength: 1 }),
-    port: Type.Number({
-      minimum: 1,
-      maximum: 65535,
-    }),
-  }),
   logLevel: Type.Enum(LogLevel),
+  sharedDirectory: Type.String({ minLength: 1 }),
   aws: Type.Object({
     accessKeyId: Type.String({ minLength: 1 }),
     secretAccessKey: Type.String({ minLength: 1 }),
     region: Type.Enum(AwsRegion),
     endpoint: Type.Optional(Type.String({ minLength: 1 })),
     s3: Type.Object({
-      ingestedVideosBucket: Type.String({ minLength: 1 }),
       encodingArtifactsBucket: Type.String({ minLength: 1 }),
     }),
   }),
   amqp: Type.Object({
     url: Type.String({ minLength: 1 }),
+    redeliveryDropThreshold: Type.Number({ minimum: 1 }),
     messageTtl: Type.Number({ minimum: 1 }),
-  }),
-  redis: Type.Object({
-    host: Type.String({ minLength: 1 }),
-    port: Type.Number({
-      minimum: 1,
-      maximum: 65535,
-    }),
   }),
 });
 

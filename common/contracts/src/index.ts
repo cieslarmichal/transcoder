@@ -10,6 +10,8 @@ export * from './amqp/messages/videoDownloadedMessage.js';
 
 export * from './amqp/messages/videoEncodingRequestedMessage.js';
 
+export * from './amqp/messages/videoArtifactUploadedMessage.js';
+
 export * from './amqp/messages/videoEncodedMessage.js';
 
 export * from './amqp/messages/encodingId.js';

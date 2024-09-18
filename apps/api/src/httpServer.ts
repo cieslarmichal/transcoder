@@ -13,10 +13,10 @@ import { type FastifySchemaValidationError } from 'fastify/types/schema.js';
 import { BaseError, InputNotValidError, OperationNotValidError, ResourceNotFoundError } from '@common/errors';
 import { type Logger } from '@common/logger';
 
-import { type HttpController } from './common/types/http/httpController.js';
-import { HttpStatusCode } from './common/types/http/httpStatusCode.js';
 import { type Config } from './config.js';
 import { HttpRouter } from './httpRouter.js';
+import { type HttpController } from './common/types/httpController.js';
+import { HttpStatusCode } from './common/types/httpStatusCode.js';
 
 export class HttpServer {
   private readonly fastifyServer: FastifyInstance;

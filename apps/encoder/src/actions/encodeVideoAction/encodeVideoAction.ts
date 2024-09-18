@@ -123,7 +123,10 @@ export class EncodeVideoAction {
     const message = {
       videoId,
       location: outputPath,
-      encodingId: encoding.id,
+      encoding: {
+        id: encoding.id,
+        container: encoding.container,
+      },
     } satisfies VideoEncodedMessage;
 
     this.amqpChannel.publish(exchangeName, routingKeys.videoEncoded, Buffer.from(JSON.stringify(message)));

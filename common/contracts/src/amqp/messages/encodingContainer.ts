@@ -83,3 +83,35 @@ export function mapVideoContainerToContentType(container: VideoContainer): strin
 
   return videoContainerToContentTypeMapping[container];
 }
+
+export function mapEncodingContainerToContentType(container: EncodingContainer): string {
+  const encodingContainerToContentTypeMapping: Record<EncodingContainer, string> = {
+    [EncodingContainer.mp4]: 'video/mp4',
+    [EncodingContainer.mov]: 'video/quicktime',
+    [EncodingContainer.avi]: 'video/x-msvideo',
+    [EncodingContainer.mkv]: 'video/x-matroska',
+    [EncodingContainer.wmv]: 'video/x-ms-wmv',
+    [EncodingContainer.flv]: 'video/x-flv',
+    [EncodingContainer.webm]: 'video/webm',
+    [EncodingContainer.mpeg]: 'video/mpeg',
+    [EncodingContainer.mpg]: 'video/mpeg',
+    [EncodingContainer['3gp']]: 'video/3gpp',
+    [EncodingContainer.ogg]: 'video/ogg',
+    [EncodingContainer.ts]: 'video/mp2t',
+    [EncodingContainer.m4v]: 'video/x-m4v',
+    [EncodingContainer.m2ts]: 'video/MP2T',
+    [EncodingContainer.vob]: 'video/dvd',
+    [EncodingContainer.rm]: 'application/vnd.rn-realmedia',
+    [EncodingContainer.rmvb]: 'application/vnd.rn-realmedia-vbr',
+    [EncodingContainer.divx]: 'video/divx',
+    [EncodingContainer.asf]: 'video/x-ms-asf',
+    [EncodingContainer.swf]: 'application/x-shockwave-flash',
+    [EncodingContainer.f4v]: 'video/x-f4v',
+    [EncodingContainer.jpeg]: 'image/jpeg',
+    [EncodingContainer.jpg]: 'image/jpeg',
+    [EncodingContainer.png]: 'image/png',
+    [EncodingContainer.gif]: 'image/gif',
+  };
+
+  return encodingContainerToContentTypeMapping[container];
+}

@@ -6,8 +6,13 @@ import { LoggerFactory } from '@common/logger';
 import { RequestVideoEncodingsAction } from './requestVideoEncodingsAction.js';
 import { ConfigFactory, type Config } from '../../config.js';
 import { AmqpProvisioner, type AmqpChannel, type AmqpConnection, type AmqpGetMessageResult } from '@common/amqp';
-import { exchangeName, queueNames, routingKeys, type VideoEncodingRequestedMessage } from '@common/contracts';
-import { VideoContainer } from '../../../../../common/contracts/src/amqp/messages/encodingContainer.js';
+import {
+  exchangeName,
+  queueNames,
+  routingKeys,
+  VideoContainer,
+  type VideoEncodingRequestedMessage,
+} from '@common/contracts';
 
 describe('RequestVideoEncodingsAction', () => {
   let action: RequestVideoEncodingsAction;

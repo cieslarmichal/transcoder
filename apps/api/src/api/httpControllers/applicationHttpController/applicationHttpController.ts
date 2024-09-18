@@ -1,9 +1,9 @@
+import { type HttpController } from '../../../common/types/httpController.js';
+import { HttpMethodName } from '../../../common/types/httpMethodName.js';
+import { type HttpOkResponse } from '../../../common/types/httpResponse.js';
+import { HttpRoute } from '../../../common/types/httpRoute.js';
+import { HttpStatusCode } from '../../../common/types/httpStatusCode.js';
 import { checkHealthResponseBodySchema, type CheckHealthResponseBody } from './schemas/checkHealthSchema.js';
-import { type HttpController } from '../../../common/types/http/httpController.js';
-import { HttpMethodName } from '../../../common/types/http/httpMethodName.js';
-import { type HttpOkResponse } from '../../../common/types/http/httpResponse.js';
-import { HttpRoute } from '../../../common/types/http/httpRoute.js';
-import { HttpStatusCode } from '../../../common/types/http/httpStatusCode.js';
 
 export class ApplicationHttpController implements HttpController {
   public readonly basePath = '/health';
