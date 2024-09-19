@@ -11,6 +11,7 @@ import {
 import { type AmqpChannel } from '@common/amqp';
 import { type S3Service } from '@common/s3';
 import { createReadStream } from 'node:fs';
+import { unlink } from 'node:fs/promises';
 
 export interface UploadVideoArtifactActionPayload {
   readonly videoId: string;
@@ -59,6 +60,21 @@ export class UploadVideoArtifactAction {
       encodingId: encoding.id,
       videoArtifactUrl,
     });
+
+    try {
+      await unlink(location);
+
+      this.logger.debug({
+        message: 'File removed from shared storage.',
+        location,
+      });
+    } catch (error) {
+      this.logger.error({
+        message: 'Failed to remove file from shared storage.',
+        location,
+        error,
+      });
+    }
 
     const message = {
       videoId,
