@@ -19,21 +19,21 @@ export class RequestVideoEncodingsAction {
   public async execute(payload: RequestVideoEncodingsActionPayload): Promise<void> {
     const { videoId, location, videoContainer } = payload;
 
-    const encodingProfiles = this.config.encoding.profiles;
+    const encodingArtifacts = this.config.encoding.artifacts;
 
     this.logger.debug({
       message: 'Requesting video encodings...',
       videoId,
       videoContainer,
-      encodingProfiles: encodingProfiles.map((profile) => profile.id),
+      encodingArtifacts: encodingArtifacts.map((artifact) => artifact.id),
     });
 
-    encodingProfiles.map((profile) => {
+    encodingArtifacts.map((encodingArtifact) => {
       const message = {
         videoId,
         location,
         videoContainer,
-        encoding: profile,
+        encoding: encodingArtifact,
       } satisfies VideoEncodingRequestedMessage;
 
       this.amqpChannel.publish(exchangeName, routingKeys.videoEncodingRequested, Buffer.from(JSON.stringify(message)));
@@ -42,7 +42,7 @@ export class RequestVideoEncodingsAction {
     this.logger.info({
       message: 'Video encodings requested.',
       videoId,
-      encodingProfiles: encodingProfiles.map((profile) => profile.id),
+      encodingProfiles: encodingArtifacts.map((profile) => profile.id),
     });
   }
 }

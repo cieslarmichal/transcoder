@@ -73,7 +73,7 @@ describe('RequestVideoEncodingsAction', () => {
       videoContainer,
     });
 
-    for (let i = 0; i < config.encoding.profiles.length; i++) {
+    for (let i = 0; i < config.encoding.artifacts.length; i++) {
       const message = (await amqpChannel.get(queueNames.encodingRequests)) as AmqpGetMessageResult;
 
       expect(message).not.toBe(false);
@@ -86,7 +86,7 @@ describe('RequestVideoEncodingsAction', () => {
 
       expect(parsedMessage.videoContainer).toEqual(videoContainer);
 
-      expect(config.encoding.profiles).toContainEqual(parsedMessage.encoding);
+      expect(config.encoding.artifacts).toContainEqual(parsedMessage.encoding);
     }
   });
 });

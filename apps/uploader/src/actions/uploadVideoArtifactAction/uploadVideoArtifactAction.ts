@@ -11,7 +11,8 @@ import {
 import { type AmqpChannel } from '@common/amqp';
 import { type S3Service } from '@common/s3';
 import { createReadStream } from 'node:fs';
-import { unlink } from 'node:fs/promises';
+import { unlink, stat, readdir } from 'node:fs/promises';
+import { join } from 'node:path';
 
 export interface UploadVideoArtifactActionPayload {
   readonly videoId: string;
@@ -39,6 +40,20 @@ export class UploadVideoArtifactAction {
       location,
       encodingId: encoding.id,
     });
+
+    const stats = await stat(location);
+
+    if (stats.isDirectory()) {
+      const files = await readdir(location);
+
+      for (const file of files) {
+        const filePath = join(location, file);
+
+        await this.uploadFileToS3(videoId, filePath, encoding);
+      }
+    } else {
+      await this.uploadFileToS3(videoId, location, encoding);
+    }
 
     const contentType = mapEncodingContainerToContentType(encoding.container);
 

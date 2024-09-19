@@ -16,6 +16,7 @@ import ffprobePath from 'ffprobe-static';
 import ffmpeg from 'fluent-ffmpeg';
 import { type RedisClient } from '@common/redis';
 import { OperationNotValidError } from '@common/errors';
+import { mkdir } from 'fs/promises';
 
 export interface EncodeVideoActionPayload {
   readonly videoId: string;
@@ -46,6 +47,7 @@ interface GenerateThumbnailsPayload {
   readonly location: string;
   readonly outputPath: string;
   readonly videoId: string;
+  readonly encoding: EncodingSpecification;
 }
 
 interface FfmpegProgressEvent {
@@ -76,7 +78,9 @@ export class EncodeVideoAction {
       encodingId: encoding.id,
     });
 
-    const outputPath = `${this.config.sharedDirectory}/${videoId}-${encoding.id}.${encoding.container}`;
+    const outputPath = `${this.config.sharedDirectory}/${videoId}/${encoding.id}`;
+
+    await mkdir(outputPath, { recursive: true });
 
     const videoDuration = await this.getVideoDuration({ videoPath: location });
 
@@ -103,6 +107,7 @@ export class EncodeVideoAction {
         location,
         outputPath,
         videoId,
+        encoding,
       });
     } else {
       throw new OperationNotValidError({
@@ -158,8 +163,23 @@ export class EncodeVideoAction {
         .setFfmpegPath(ffmpegPath as unknown as string)
         .input(location)
         .inputOptions('-y')
-        .outputOptions([`-s ${encoding.width}x${encoding.height}`, `-b:v ${encoding.bitrate}k`, `-r ${encoding.fps}`])
-        .output(outputPath)
+        .outputOptions([
+          `-s ${encoding.width}x${encoding.height}`,
+          `-b:v ${encoding.bitrate}k`,
+          `-r ${encoding.fps}`,
+          '-c:a aac',
+          '-ar 48000',
+          '-c:v h264',
+          '-profile:v main',
+          '-crf 20',
+          '-sc_threshold 0',
+          '-g 48',
+          '-keyint_min 48',
+          '-hls_time 10',
+          '-hls_playlist_type vod',
+          `-hls_segment_filename ${outputPath}/segment_%03d.ts`,
+        ])
+        .output(`${outputPath}/playlist.m3u8`)
         .on('end', resolve)
         .on('error', reject)
         .on('progress', async (event: FfmpegProgressEvent) => {
@@ -198,7 +218,7 @@ export class EncodeVideoAction {
   }
 
   private async generateThumbnails(payload: GenerateThumbnailsPayload): Promise<void> {
-    const { location, outputPath, videoId } = payload;
+    const { location, outputPath, videoId, encoding } = payload;
 
     await new Promise<void>((resolve, reject) => {
       const tempDir = '/tmp';
@@ -216,7 +236,7 @@ export class EncodeVideoAction {
               .setFfmpegPath(ffmpegPath as unknown as string)
               .input(tempPattern)
               .outputOptions(['-y', '-filter_complex', 'tile=20x40'])
-              .output(outputPath)
+              .output(`${outputPath}.${encoding.container}`)
               .on('end', resolveCombine)
               .on('error', rejectCombine)
 

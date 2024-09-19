@@ -7,7 +7,7 @@
     "messageTtl": 30000
   },
   "encoding": {
-    "profiles": [
+    "artifacts": [
       {
         "id": "360p",
         "container": "mp4",

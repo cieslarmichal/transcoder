@@ -15,7 +15,7 @@ const configSchema = Type.Object({
     messageTtl: Type.Number({ minimum: 1 }),
   }),
   encoding: Type.Object({
-    profiles: Type.Array(
+    artifacts: Type.Array(
       Type.Object({
         id: Type.Enum(EncodingId),
         container: Type.Enum(EncodingContainer),
