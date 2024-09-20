@@ -9,12 +9,11 @@ flowchart TB
   ENCODING_DIRECTOR[Encoding Director Service]:::service
   ENCODER[Encoder Service]:::service
   UPLOADER[Uploader Service]:::service
-  NOTIFIER[Notifier Service]:::service
+  PLAYLIST_STICHER[Playlist Sticher Service]:::service
 
   USERS[Users]:::external
   RABBITMQ[RabbitMQ]:::external
   S3[S3 Storage]:::external
-  EMAIL_PROVIDER[Email Provider]:::external
 
   REDIS[Redis]:::db
 
@@ -30,9 +29,9 @@ flowchart TB
   DOWNLOADER -->|done| RABBITMQ
 
   RABBITMQ -->|video id| ENCODING_DIRECTOR
-  ENCODING_DIRECTOR -->|video encoding profile| RABBITMQ
+  ENCODING_DIRECTOR -->|video encoding spec| RABBITMQ
 
-  RABBITMQ -->|video path with encoding profile| ENCODER
+  RABBITMQ -->|video path with encoding spec| ENCODER
   ENCODER -->|save progress| REDIS
   ENCODER -->|done| RABBITMQ
 
@@ -40,8 +39,8 @@ flowchart TB
   UPLOADER -->|file upload| S3
   UPLOADER -->|done| RABBITMQ
 
-  RABBITMQ -->|email and url| NOTIFIER
-  NOTIFIER -->|send email| EMAIL_PROVIDER
+  RABBITMQ -->|encoding id| PLAYLIST_STICHER
+  PLAYLIST_STICHER -->|master playlist upload| S3
 
   classDef db color:#fff,fill:#ff9655,stroke:#ffa764,stroke-width:2px;
   classDef external color:#fff,fill:#9b84d0,stroke:#9676d7,stroke-width:2px;
@@ -57,7 +56,7 @@ flowchart LR
   ENCODING_DIRECTOR[Encoding Director Service]:::service
   ENCODER[Encoder Service]:::service
   UPLOADER[Uploader Service]:::service
-  NOTIFIER[Notifier Service]:::service
+  PLAYLIST_STICHER[Playlist Sticher Service]:::service
 
   INGESTED_VIDEOS[ingested-videos queue]:::queue
   DOWNLOADED_VIDEOS[downloaded-videos queue]:::queue
@@ -85,7 +84,7 @@ flowchart LR
 
   UPLOADER -->|video.artifact.uploaded| EXCHANGE
   EXCHANGE --> UPLOADED_ARTIFACTS
-  UPLOADED_ARTIFACTS --> NOTIFIER
+  UPLOADED_ARTIFACTS --> PLAYLIST_STICHER
 
   classDef queue color:#fff,fill:#ff9655,stroke:#ffa764,stroke-width:2px;
   classDef exchange color:#fff,fill:#9b84d0,stroke:#9676d7,stroke-width:2px;
@@ -127,7 +126,8 @@ flowchart LR
 - Uploads encoding artifacts from shared volume to S3
 - Sends an uploading done message to RabbitMQ
 
-### Notifier Service
+### Playlist Sticher Service
 
-- Consumes messages about uploading done from RabbitMQ
-- Sends an email to the user with a download link
+- Consumes messages with encoding id from RabbitMQ
+- Creates a master playlist for the encoded videos
+- Uploads the master playlist to S3

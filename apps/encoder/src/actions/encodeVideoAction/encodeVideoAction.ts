@@ -127,11 +127,8 @@ export class EncodeVideoAction {
 
     const message = {
       videoId,
-      location: outputPath,
-      encoding: {
-        id: encoding.id,
-        container: encoding.container,
-      },
+      artifactsDirectory: outputPath,
+      encodingId: encoding.id,
     } satisfies VideoEncodedMessage;
 
     this.amqpChannel.publish(exchangeName, routingKeys.videoEncoded, Buffer.from(JSON.stringify(message)));
@@ -158,6 +155,8 @@ export class EncodeVideoAction {
   private async transcodeVideo(payload: TranscodeVideoPayload): Promise<void> {
     const { location, outputPath, encoding, videoDuration, redisProgressKey } = payload;
 
+    const outputVideoPath = `${outputPath}/${encoding.id}.${encoding.container}`;
+
     await new Promise((resolve, reject) => {
       ffmpeg()
         .setFfmpegPath(ffmpegPath as unknown as string)
@@ -175,11 +174,8 @@ export class EncodeVideoAction {
           '-sc_threshold 0',
           '-g 48',
           '-keyint_min 48',
-          '-hls_time 10',
-          '-hls_playlist_type vod',
-          `-hls_segment_filename ${outputPath}/segment_%03d.ts`,
         ])
-        .output(`${outputPath}/playlist.m3u8`)
+        .output(outputVideoPath)
         .on('end', resolve)
         .on('error', reject)
         .on('progress', async (event: FfmpegProgressEvent) => {
@@ -189,6 +185,24 @@ export class EncodeVideoAction {
 
           await this.redisClient.hset(redisProgressKey, { [encoding.id]: `${percentageProgress}%` });
         })
+        .run();
+    });
+
+    await new Promise((resolve, reject) => {
+      ffmpeg()
+        .setFfmpegPath(ffmpegPath as unknown as string)
+        .input(outputVideoPath)
+        .inputOptions('-y')
+        .outputOptions([
+          '-hls_time 10',
+          '-hls_playlist_type vod',
+          '-hls_flags single_file',
+          '-hls_segment_type fmp4',
+          '-hls_segment_filename output.mp4',
+        ])
+        .output(`${outputPath}/playlist_${encoding.id}.m3u8`)
+        .on('end', resolve)
+        .on('error', reject)
         .run();
     });
   }
@@ -210,7 +224,7 @@ export class EncodeVideoAction {
           `-b:v ${encoding.bitrate}k`,
           `-r ${encoding.fps}`,
         ])
-        .output(outputPath)
+        .output(`${outputPath}/${encoding.id}.${encoding.container}`)
         .on('end', resolve)
         .on('error', reject)
         .run();
@@ -236,10 +250,9 @@ export class EncodeVideoAction {
               .setFfmpegPath(ffmpegPath as unknown as string)
               .input(tempPattern)
               .outputOptions(['-y', '-filter_complex', 'tile=20x40'])
-              .output(`${outputPath}.${encoding.container}`)
+              .output(`${outputPath}/${encoding.id}.${encoding.container}`)
               .on('end', resolveCombine)
               .on('error', rejectCombine)
-
               .run();
           });
 

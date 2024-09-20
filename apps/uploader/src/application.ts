@@ -3,7 +3,7 @@ import { type Logger, LoggerFactory } from '@common/logger';
 
 import { type Config, ConfigFactory } from './config.js';
 import { exchangeName, queueNames, routingKeys } from '@common/contracts';
-import { UploadVideoArtifactAction } from './actions/uploadVideoArtifactAction/uploadVideoArtifactAction.js';
+import { UploadVideoArtifactAction } from './actions/uploadVideoArtifactsAction/uploadVideoArtifactAction.jss';
 import { VideoEncodedMessageConsumer } from './api/messageConsumers/videoEncodedMessageConsumer.js';
 import { S3Service, S3ClientFactory } from '@common/s3';
 

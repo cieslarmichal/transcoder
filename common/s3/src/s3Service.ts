@@ -6,6 +6,7 @@ import {
   GetObjectCommand,
   HeadObjectCommand,
   ListObjectsV2Command,
+  type PutObjectCommandInput,
   type S3Client,
 } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
@@ -15,10 +16,10 @@ import { OperationNotValidError } from '@common/errors';
 
 export interface UploadBlobPayload {
   readonly blobName: string;
-  readonly sourceName?: string;
   readonly bucketName: string;
   readonly data: Readable;
   readonly contentType: string;
+  readonly attachmentName?: string;
 }
 
 export interface UploadBlobResult {
@@ -53,20 +54,23 @@ export class S3Service {
   public constructor(private readonly s3Client: S3Client) {}
 
   public async uploadBlob(payload: UploadBlobPayload): Promise<UploadBlobResult> {
-    const { bucketName, blobName, data, contentType, sourceName } = payload;
+    const { bucketName, blobName, data, contentType, attachmentName } = payload;
 
-    const attachmentFileName = sourceName ? sourceName : blobName;
+    const putObjectInput: PutObjectCommandInput = {
+      Bucket: bucketName,
+      Key: blobName,
+      Body: data,
+      ContentType: contentType,
+      ACL: 'public-read',
+    };
+
+    if (attachmentName) {
+      putObjectInput.ContentDisposition = `attachment; filename=${attachmentName}`;
+    }
 
     const upload = new Upload({
       client: this.s3Client,
-      params: {
-        Bucket: bucketName,
-        Key: blobName,
-        Body: data,
-        ContentType: contentType,
-        ContentDisposition: `attachment; filename=${attachmentFileName}`,
-        ACL: 'public-read',
-      },
+      params: putObjectInput,
     });
 
     const { Location } = await upload.done();

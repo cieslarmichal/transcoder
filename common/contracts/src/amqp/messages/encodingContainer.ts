@@ -50,10 +50,15 @@ export enum EncodingContainer {
   jpg = 'jpg',
   png = 'png',
   gif = 'gif',
+  m3u8 = 'm3u8',
 }
 
 export function isVideoContainer(container: string): container is VideoContainer {
   return Object.values(VideoContainer).includes(container as VideoContainer);
+}
+
+export function isEncodingContainer(container: string | undefined): container is EncodingContainer {
+  return Object.values(EncodingContainer).includes(container as EncodingContainer);
 }
 
 export function mapVideoContainerToContentType(container: VideoContainer): string {
@@ -111,6 +116,7 @@ export function mapEncodingContainerToContentType(container: EncodingContainer):
     [EncodingContainer.jpg]: 'image/jpeg',
     [EncodingContainer.png]: 'image/png',
     [EncodingContainer.gif]: 'image/gif',
+    [EncodingContainer.m3u8]: 'application/vnd.apple.mpegurl',
   };
 
   return encodingContainerToContentTypeMapping[container];

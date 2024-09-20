@@ -1,18 +1,18 @@
 import { type ConsumePayload, type MessageConsumer } from '@common/amqp';
 import { Value } from '@sinclair/typebox/value';
 import { videoEncodedMessageSchema } from '@common/contracts';
-import { type UploadVideoArtifactAction } from '../../actions/uploadVideoArtifactAction/uploadVideoArtifactAction.js';
+import { type UploadVideoArtifactsAction } from '../../actions/uploadVideoArtifactsAction/uploadVideoArtifactsAction.js';
 
 export class VideoEncodedMessageConsumer implements MessageConsumer {
-  public constructor(private readonly uploadVideoArtifactAction: UploadVideoArtifactAction) {}
+  public constructor(private readonly uploadVideoArtifactsAction: UploadVideoArtifactsAction) {}
 
   public async consume(payload: ConsumePayload): Promise<void> {
-    const { videoId, location, encoding } = Value.Decode(videoEncodedMessageSchema, payload.message);
+    const { videoId, artifactsDirectory, encodingId } = Value.Decode(videoEncodedMessageSchema, payload.message);
 
-    await this.uploadVideoArtifactAction.execute({
+    await this.uploadVideoArtifactsAction.execute({
       videoId,
-      location,
-      encoding,
+      artifactsDirectory,
+      encodingId,
     });
   }
 }
