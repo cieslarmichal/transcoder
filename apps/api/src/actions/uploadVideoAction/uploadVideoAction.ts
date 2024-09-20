@@ -1,20 +1,20 @@
 import { type Readable } from 'node:stream';
 
-import { type Logger } from '@common/logger';
-import { type S3Service } from '@common/s3';
+import { type Logger } from '@libs/logger';
+import { type S3Service } from '@libs/s3';
 
-import { type UuidService } from '../../common/uuid/uuidService.js';
 import {
   exchangeName,
   routingKeys,
   type VideoIngestedMessage,
   isVideoContainer,
   mapVideoContainerToContentType,
-} from '@common/contracts';
-import { OperationNotValidError } from '@common/errors';
-import { type RedisClient } from '@common/redis';
-import { type AmqpChannel } from '@common/amqp';
+} from '@libs/contracts';
+import { OperationNotValidError } from '@libs/errors';
+import { type RedisClient } from '@libs/redis';
+import { type AmqpChannel } from '@libs/amqp';
 import { type Config } from '../../config.js';
+import { type UuidService } from '@libs/uuid';
 
 export interface UploadVideoActionPayload {
   readonly fileName: string;
@@ -76,12 +76,12 @@ export class UploadVideoAction {
 
     const videoId = this.uuidService.generateUuid();
 
-    const blobName = `${videoId}/source.${fileExtension}`;
+    const blobName = `${videoId}.${fileExtension}`;
 
     const { location: videoUrl } = await this.s3Service.uploadBlob({
       bucketName,
       blobName,
-      sourceName: fileName,
+      attachmentName: blobName,
       data,
       contentType: videoContentType,
     });

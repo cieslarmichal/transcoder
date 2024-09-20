@@ -1,5 +1,5 @@
 {
-  "name": "@common/amqp",
+  "name": "@libs/amqp",
   "type": "module",
   "exports": {
     ".": {
@@ -22,7 +22,7 @@
     "lint:fix": "npm run lint -- --fix"
   },
   "dependencies": {
-    "@common/logger": "*",
+    "@libs/logger": "*",
     "amqplib": "0.10.4"
   },
   "devDependencies": {

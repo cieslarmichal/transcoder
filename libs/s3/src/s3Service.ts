@@ -12,7 +12,7 @@ import {
 import { Upload } from '@aws-sdk/lib-storage';
 import { type Readable } from 'node:stream';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import { OperationNotValidError } from '@common/errors';
+import { OperationNotValidError } from '@libs/errors';
 
 export interface UploadBlobPayload {
   readonly blobName: string;

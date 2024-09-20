@@ -2,9 +2,9 @@ import { type Static, Type } from '@sinclair/typebox';
 import { TransformDecodeCheckError, Value } from '@sinclair/typebox/value';
 import config from 'config';
 
-import { ConfigurationError } from '@common/errors';
-import { LogLevel } from '@common/logger';
-import { EncodingId, EncodingContainer } from '@common/contracts';
+import { ConfigurationError } from '@libs/errors';
+import { LogLevel } from '@libs/logger';
+import { EncodingId, EncodingContainer } from '@libs/contracts';
 
 const configSchema = Type.Object({
   appName: Type.String({ minLength: 1 }),

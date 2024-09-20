@@ -1,7 +1,7 @@
-import { type Logger } from '@common/logger';
+import { type Logger } from '@libs/logger';
 import { type Config } from '../../config.js';
-import { exchangeName, routingKeys, type VideoEncodingRequestedMessage, type VideoContainer } from '@common/contracts';
-import { type AmqpChannel } from '@common/amqp';
+import { exchangeName, routingKeys, type VideoEncodingRequestedMessage, type VideoContainer } from '@libs/contracts';
+import { type AmqpChannel } from '@libs/amqp';
 
 export interface RequestVideoEncodingsActionPayload {
   readonly videoId: string;

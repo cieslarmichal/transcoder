@@ -2,12 +2,12 @@
 import { faker } from '@faker-js/faker';
 import { expect, describe, it, beforeEach, afterEach } from 'vitest';
 
-import { LoggerFactory } from '@common/logger';
+import { LoggerFactory } from '@libs/logger';
 
 import { ConfigFactory, type Config } from '../../config.js';
 import { GetVideoEncodingProgressAction } from './getVideoEncodingProgressAction.js';
-import { RedisClientFactory, type RedisClient } from '@common/redis';
-import { ResourceNotFoundError } from '@common/errors';
+import { RedisClientFactory, type RedisClient } from '@libs/redis';
+import { ResourceNotFoundError } from '@libs/errors';
 
 describe('GetVideoEncodingProgressAction', () => {
   let action: GetVideoEncodingProgressAction;

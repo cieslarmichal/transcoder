@@ -1,0 +1,29 @@
+{
+  "name": "@libs/logger",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/src/index.js",
+      "types": "./dist/src/index.d.ts"
+    }
+  },
+  "types": "dist/src/index.d.ts",
+  "files": [
+    "/dist"
+  ],
+  "scripts": {
+    "build": "tsc --build tsconfig.json",
+    "build:dev": "tsc --build tsconfig.json"
+  },
+  "dependencies": {
+    "pino": "9.4.0"
+  },
+  "volta": {
+    "node": "20.17.0",
+    "npm": "10.8.3"
+  },
+  "engines": {
+    "node": "20.17.0"
+  },
+  "packageManager": "npm@10.8.3"
+}

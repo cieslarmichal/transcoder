@@ -1,8 +1,8 @@
-import { type AmqpChannel, type AmqpConnection, AmqpProvisioner, MessageConsumerExecutor } from '@common/amqp';
-import { type Logger, LoggerFactory } from '@common/logger';
+import { type AmqpChannel, type AmqpConnection, AmqpProvisioner, MessageConsumerExecutor } from '@libs/amqp';
+import { type Logger, LoggerFactory } from '@libs/logger';
 
 import { type Config, ConfigFactory } from './config.js';
-import { exchangeName, queueNames, routingKeys } from '@common/contracts';
+import { exchangeName, queueNames, routingKeys } from '@libs/contracts';
 import { VideoDownloadedMessageConsumer } from './api/messageConsumers/videoDownloadedMessageConsumer.js';
 import { RequestVideoEncodingsAction } from './actions/requestVideoEncodingsAction/requestVideoEncodingsAction.js';
 

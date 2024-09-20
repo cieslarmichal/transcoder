@@ -1,4 +1,4 @@
-import { type Logger } from '@common/logger';
+import { type Logger } from '@libs/logger';
 import { type Channel, connect, type Connection } from 'amqplib';
 
 export interface CreateConnectionPayload {

@@ -1,6 +1,6 @@
-import { ResourceNotFoundError } from '@common/errors';
-import { type Logger } from '@common/logger';
-import { type RedisClient } from '@common/redis';
+import { ResourceNotFoundError } from '@libs/errors';
+import { type Logger } from '@libs/logger';
+import { type RedisClient } from '@libs/redis';
 
 export interface GetVideoEncodingProgressActionPayload {
   readonly videoId: string;

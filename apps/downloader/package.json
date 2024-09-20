@@ -14,10 +14,10 @@
     "lint:fix": "npm run lint -- --fix"
   },
   "dependencies": {
-    "@common/amqp": "*",
-    "@common/contracts": "*",
-    "@common/errors": "*",
-    "@common/logger": "*",
+    "@libs/amqp": "*",
+    "@libs/contracts": "*",
+    "@libs/errors": "*",
+    "@libs/logger": "*",
     "axios": "1.7.7"
   },
   "volta": {

@@ -1,5 +1,5 @@
-import { type Logger } from '@common/logger';
-import { type S3Service } from '@common/s3';
+import { type Logger } from '@libs/logger';
+import { type S3Service } from '@libs/s3';
 import { type Config } from '../../config.js';
 
 export interface GetVideoEncodingArtifactsActionPayload {

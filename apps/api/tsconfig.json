@@ -3,25 +3,31 @@
   "compilerOptions": {
     "outDir": "./dist",
   },
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts", "../../libs/uuid/src/uuidService.ts"],
   "references": [
     {
-      "path": "../../common/amqp/tsconfig.json"
+      "path": "../../libs/amqp/tsconfig.json"
     },
     {
-      "path": "../../common/contracts/tsconfig.json"
+      "path": "../../libs/contracts/tsconfig.json"
     },
     {
-      "path": "../../common/errors/tsconfig.json"
+      "path": "../../libs/errors/tsconfig.json"
     },
     {
-      "path": "../../common/logger/tsconfig.json"
+      "path": "../../libs/http/tsconfig.json"
     },
     {
-      "path": "../../common/redis/tsconfig.json"
+      "path": "../../libs/logger/tsconfig.json"
     },
     {
-      "path": "../../common/s3/tsconfig.json"
-    }
+      "path": "../../libs/redis/tsconfig.json"
+    },
+    {
+      "path": "../../libs/s3/tsconfig.json"
+    },
+    {
+      "path": "../../libs/uuid/tsconfig.json"
+    },
   ]
 }

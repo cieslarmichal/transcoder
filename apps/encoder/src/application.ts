@@ -1,11 +1,11 @@
-import { type AmqpChannel, type AmqpConnection, AmqpProvisioner, MessageConsumerExecutor } from '@common/amqp';
-import { type Logger, LoggerFactory } from '@common/logger';
+import { type AmqpChannel, type AmqpConnection, AmqpProvisioner, MessageConsumerExecutor } from '@libs/amqp';
+import { type Logger, LoggerFactory } from '@libs/logger';
 
 import { type Config, ConfigFactory } from './config.js';
-import { exchangeName, queueNames, routingKeys } from '@common/contracts';
+import { exchangeName, queueNames, routingKeys } from '@libs/contracts';
 import { EncodeVideoAction } from './actions/encodeVideoAction/encodeVideoAction.js';
 import { VideoEncodingRequestedMessageConsumer } from './api/messageConsumers/videoEncodingRequestedMessageConsumer.js';
-import { type RedisClient, RedisClientFactory } from '@common/redis';
+import { type RedisClient, RedisClientFactory } from '@libs/redis';
 
 export class Application {
   private readonly config: Config;

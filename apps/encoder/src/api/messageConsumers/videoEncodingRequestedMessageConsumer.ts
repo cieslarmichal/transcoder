@@ -1,7 +1,7 @@
-import { type ConsumePayload, type MessageConsumer } from '@common/amqp';
+import { type ConsumePayload, type MessageConsumer } from '@libs/amqp';
 import { type EncodeVideoAction } from '../../actions/encodeVideoAction/encodeVideoAction.js';
 import { Value } from '@sinclair/typebox/value';
-import { videoEncodingRequestedMessageSchema } from '@common/contracts';
+import { videoEncodingRequestedMessageSchema } from '@libs/contracts';
 
 export class VideoEncodingRequestedMessageConsumer implements MessageConsumer {
   public constructor(private readonly encodeVideoAction: EncodeVideoAction) {}

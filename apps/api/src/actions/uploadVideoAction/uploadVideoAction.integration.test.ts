@@ -3,17 +3,17 @@ import { createReadStream } from 'node:fs';
 import { expect, describe, it, beforeEach, afterEach } from 'vitest';
 import { resolve, join } from 'node:path';
 
-import { LoggerFactory } from '@common/logger';
-import { S3ClientFactory, S3Service } from '@common/s3';
-import { S3TestUtils } from '@common/s3/tests';
+import { LoggerFactory } from '@libs/logger';
+import { S3ClientFactory, S3Service } from '@libs/s3';
+import { S3TestUtils } from '@libs/s3/tests';
 
 import { UploadVideoAction } from './uploadVideoAction.js';
-import { type UuidService } from '../../common/uuid/uuidService.js';
 import { ConfigFactory, type Config } from '../../config.js';
-import { AmqpProvisioner, type AmqpChannel, type AmqpConnection, type AmqpGetMessageResult } from '@common/amqp';
-import { exchangeName, queueNames, routingKeys, type VideoIngestedMessage } from '@common/contracts';
-import { OperationNotValidError } from '@common/errors';
-import { type RedisClient, RedisClientFactory } from '@common/redis';
+import { AmqpProvisioner, type AmqpChannel, type AmqpConnection, type AmqpGetMessageResult } from '@libs/amqp';
+import { exchangeName, queueNames, routingKeys, type VideoIngestedMessage } from '@libs/contracts';
+import { OperationNotValidError } from '@libs/errors';
+import { type RedisClient, RedisClientFactory } from '@libs/redis';
+import { type UuidService } from '@libs/uuid';
 
 describe('UploadVideoAction', () => {
   let action: UploadVideoAction;
@@ -96,7 +96,7 @@ describe('UploadVideoAction', () => {
   it('uploads a video', async () => {
     const userEmail = faker.internet.email();
 
-    const blobName = `${videoId}/source`;
+    const blobName = `${videoId}.mp4`;
 
     const existsBefore = await s3TestUtils.objectExists(config.aws.s3.ingestedVideosBucket, blobName);
 

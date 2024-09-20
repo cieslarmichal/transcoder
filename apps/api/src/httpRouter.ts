@@ -5,11 +5,14 @@ import { type FastifyInstance, type FastifyReply, type FastifyRequest, type Fast
 import { createWriteStream } from 'node:fs';
 import { promisify } from 'node:util';
 import { pipeline } from 'node:stream';
-import { type HttpController } from './common/types/httpController.js';
-import { HttpHeader } from './common/types/httpHeader.js';
-import { HttpMediaType } from './common/types/httpMediaType.js';
-import { type AttachedFile } from './common/types/httpRequest.js';
-import { type HttpRoute, type HttpRouteSchema } from './common/types/httpRoute.js';
+import {
+  type HttpController,
+  type HttpRoute,
+  type AttachedFile,
+  HttpHeader,
+  HttpMediaType,
+  type HttpRouteSchema,
+} from '@libs/http';
 
 const streamPipeline = promisify(pipeline);
 

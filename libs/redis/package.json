@@ -1,5 +1,5 @@
 {
-  "name": "@common/redis",
+  "name": "@libs/redis",
   "type": "module",
   "exports": {
     ".": {
@@ -22,7 +22,7 @@
     "lint:fix": "npm run lint -- --fix"
   },
   "dependencies": {
-    "@common/logger": "*",
+    "@libs/logger": "*",
     "ioredis": "5.4.1"
   },
   "volta": {

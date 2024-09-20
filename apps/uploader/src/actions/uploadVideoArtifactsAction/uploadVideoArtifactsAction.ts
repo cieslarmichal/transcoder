@@ -1,4 +1,4 @@
-import { type Logger } from '@common/logger';
+import { type Logger } from '@libs/logger';
 import { type Config } from '../../config.js';
 import {
   type EncodingId,
@@ -7,9 +7,9 @@ import {
   mapEncodingContainerToContentType,
   routingKeys,
   type VideoArtifactsUploadedMessage,
-} from '@common/contracts';
-import { type AmqpChannel } from '@common/amqp';
-import { type S3Service } from '@common/s3';
+} from '@libs/contracts';
+import { type AmqpChannel } from '@libs/amqp';
+import { type S3Service } from '@libs/s3';
 import { createReadStream } from 'node:fs';
 import { readdir, rm } from 'node:fs/promises';
 import { join } from 'node:path';

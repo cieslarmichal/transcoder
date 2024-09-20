@@ -1,4 +1,4 @@
-import { OperationNotValidError } from '@common/errors';
+import { OperationNotValidError } from '@libs/errors';
 
 import {
   type UploadVideoQueryParamsDto,
@@ -22,12 +22,15 @@ import {
   type GetVideoEncodingArtifactsResponseBodyDto,
 } from './schemas/getVideoEncodingArtifactsSchema.js';
 import { createReadStream } from 'node:fs';
-import { type HttpController } from '../../../common/types/httpController.js';
-import { HttpMethodName } from '../../../common/types/httpMethodName.js';
-import { type HttpRequest } from '../../../common/types/httpRequest.js';
-import { type HttpCreatedResponse, type HttpOkResponse } from '../../../common/types/httpResponse.js';
-import { HttpRoute } from '../../../common/types/httpRoute.js';
-import { HttpStatusCode } from '../../../common/types/httpStatusCode.js';
+import {
+  type HttpController,
+  HttpRoute,
+  HttpMethodName,
+  HttpStatusCode,
+  type HttpRequest,
+  type HttpCreatedResponse,
+  type HttpOkResponse,
+} from '@libs/http';
 
 export class VideoHttpController implements HttpController {
   public readonly basePath = '/videos';

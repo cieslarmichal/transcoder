@@ -1,6 +1,6 @@
 import { type Channel, type Message } from 'amqplib';
 import { type MessageConsumer } from './messageConsumer.js';
-import { type Logger } from '@common/logger';
+import { type Logger } from '@libs/logger';
 
 export class MessageConsumerExecutor {
   public constructor(

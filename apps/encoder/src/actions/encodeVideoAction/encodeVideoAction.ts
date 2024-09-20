@@ -1,4 +1,4 @@
-import { type Logger } from '@common/logger';
+import { type Logger } from '@libs/logger';
 import { type Config } from '../../config.js';
 import {
   EncodingId,
@@ -9,13 +9,13 @@ import {
   type EncodingSpecification,
   isTranscodingEncodingId,
   isPreviewEncodingId,
-} from '@common/contracts';
-import { type AmqpChannel } from '@common/amqp';
+} from '@libs/contracts';
+import { type AmqpChannel } from '@libs/amqp';
 import ffmpegPath from 'ffmpeg-static';
 import ffprobePath from 'ffprobe-static';
 import ffmpeg from 'fluent-ffmpeg';
-import { type RedisClient } from '@common/redis';
-import { OperationNotValidError } from '@common/errors';
+import { type RedisClient } from '@libs/redis';
+import { OperationNotValidError } from '@libs/errors';
 import { mkdir } from 'fs/promises';
 
 export interface EncodeVideoActionPayload {

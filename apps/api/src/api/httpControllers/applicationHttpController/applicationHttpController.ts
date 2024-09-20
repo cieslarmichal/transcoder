@@ -1,8 +1,4 @@
-import { type HttpController } from '../../../common/types/httpController.js';
-import { HttpMethodName } from '../../../common/types/httpMethodName.js';
-import { type HttpOkResponse } from '../../../common/types/httpResponse.js';
-import { HttpRoute } from '../../../common/types/httpRoute.js';
-import { HttpStatusCode } from '../../../common/types/httpStatusCode.js';
+import { type HttpController, HttpRoute, HttpMethodName, HttpStatusCode, type HttpOkResponse } from '@libs/http';
 import { checkHealthResponseBodySchema, type CheckHealthResponseBody } from './schemas/checkHealthSchema.js';
 
 export class ApplicationHttpController implements HttpController {

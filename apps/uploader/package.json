@@ -14,11 +14,11 @@
     "lint:fix": "npm run lint -- --fix"
   },
   "dependencies": {
-    "@common/amqp": "*",
-    "@common/contracts": "*",
-    "@common/errors": "*",
-    "@common/logger": "*",
-    "@common/s3": "*"
+    "@libs/amqp": "*",
+    "@libs/contracts": "*",
+    "@libs/errors": "*",
+    "@libs/logger": "*",
+    "@libs/s3": "*"
   },
   "volta": {
     "node": "20.17.0",

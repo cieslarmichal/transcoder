@@ -1,4 +1,4 @@
-import { BaseError } from '@common/errors';
+import { BaseError } from '@libs/errors';
 
 import { Application } from './application.js';
 

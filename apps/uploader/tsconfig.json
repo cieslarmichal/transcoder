@@ -7,19 +7,19 @@
   "exclude": [],
   "references": [
     {
-      "path": "../../common/amqp/tsconfig.json"
+      "path": "../../libs/amqp/tsconfig.json"
     },
     {
-      "path": "../../common/contracts/tsconfig.json"
+      "path": "../../libs/contracts/tsconfig.json"
     },
     {
-      "path": "../../common/errors/tsconfig.json"
+      "path": "../../libs/errors/tsconfig.json"
     },
     {
-      "path": "../../common/logger/tsconfig.json"
+      "path": "../../libs/logger/tsconfig.json"
     },
     {
-      "path": "../../common/s3/tsconfig.json"
+      "path": "../../libs/s3/tsconfig.json"
     },
   ]
 }

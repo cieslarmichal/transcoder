@@ -1,5 +1,5 @@
 {
-  "name": "@common/errors",
+  "name": "@libs/contracts",
   "type": "module",
   "exports": {
     ".": {

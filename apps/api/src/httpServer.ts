@@ -10,13 +10,12 @@ import { type TypeBoxTypeProvider } from '@fastify/type-provider-typebox';
 import { fastify, type FastifyInstance } from 'fastify';
 import { type FastifySchemaValidationError } from 'fastify/types/schema.js';
 
-import { BaseError, InputNotValidError, OperationNotValidError, ResourceNotFoundError } from '@common/errors';
-import { type Logger } from '@common/logger';
+import { BaseError, InputNotValidError, OperationNotValidError, ResourceNotFoundError } from '@libs/errors';
+import { type Logger } from '@libs/logger';
 
 import { type Config } from './config.js';
 import { HttpRouter } from './httpRouter.js';
-import { type HttpController } from './common/types/httpController.js';
-import { HttpStatusCode } from './common/types/httpStatusCode.js';
+import { HttpStatusCode, type HttpController } from '@libs/http';
 
 export class HttpServer {
   private readonly fastifyServer: FastifyInstance;

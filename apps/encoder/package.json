@@ -14,11 +14,11 @@
     "lint:fix": "npm run lint -- --fix"
   },
   "dependencies": {
-    "@common/amqp": "*",
-    "@common/contracts": "*",
-    "@common/errors": "*",
-    "@common/logger": "*",
-    "@common/redis": "*",
+    "@libs/amqp": "*",
+    "@libs/contracts": "*",
+    "@libs/errors": "*",
+    "@libs/logger": "*",
+    "@libs/redis": "*",
     "ffmpeg-static": "5.2.0",
     "ffprobe-static": "3.1.0",
     "fluent-ffmpeg": "2.1.3"

@@ -1,11 +1,11 @@
-import { type AmqpChannel, type AmqpConnection, AmqpProvisioner, MessageConsumerExecutor } from '@common/amqp';
-import { type Logger, LoggerFactory } from '@common/logger';
+import { type AmqpChannel, type AmqpConnection, AmqpProvisioner, MessageConsumerExecutor } from '@libs/amqp';
+import { type Logger, LoggerFactory } from '@libs/logger';
 
 import { type Config, ConfigFactory } from './config.js';
-import { exchangeName, queueNames, routingKeys } from '@common/contracts';
-import { UploadVideoArtifactAction } from './actions/uploadVideoArtifactsAction/uploadVideoArtifactAction.jss';
+import { exchangeName, queueNames, routingKeys } from '@libs/contracts';
 import { VideoEncodedMessageConsumer } from './api/messageConsumers/videoEncodedMessageConsumer.js';
-import { S3Service, S3ClientFactory } from '@common/s3';
+import { S3Service, S3ClientFactory } from '@libs/s3';
+import { UploadVideoArtifactsAction } from './actions/uploadVideoArtifactsAction/uploadVideoArtifactsAction.js';
 
 export class Application {
   private readonly config: Config;
@@ -30,14 +30,14 @@ export class Application {
 
     const s3Service = new S3Service(S3ClientFactory.create(this.config.aws));
 
-    const uploadVideoAction = new UploadVideoArtifactAction(
+    const uploadVideoArtifactsAction = new UploadVideoArtifactsAction(
       this.amqpChannel as AmqpChannel,
       s3Service,
       this.logger,
       this.config,
     );
 
-    const messageConsumer = new VideoEncodedMessageConsumer(uploadVideoAction);
+    const messageConsumer = new VideoEncodedMessageConsumer(uploadVideoArtifactsAction);
 
     const messageConsumerExecutor = new MessageConsumerExecutor(
       messageConsumer,
