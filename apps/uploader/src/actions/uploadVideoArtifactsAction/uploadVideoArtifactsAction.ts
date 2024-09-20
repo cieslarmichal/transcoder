@@ -60,7 +60,7 @@ export class UploadVideoArtifactsAction {
 
         await this.s3Service.uploadBlob({
           bucketName: this.config.aws.s3.encodingArtifactsBucket,
-          blobName: `${videoId}/${fileName}`,
+          blobName: `${videoId}/${encodingId}/${fileName}`,
           data: createReadStream(fullPath),
           contentType,
         });
