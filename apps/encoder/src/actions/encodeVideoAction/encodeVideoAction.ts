@@ -88,32 +88,45 @@ export class EncodeVideoAction {
 
     await this.redisClient.hset(redisProgressKey, { [encoding.id]: '0%' });
 
-    if (isTranscodingEncodingId(encoding.id)) {
-      await this.transcodeVideo({
-        location,
-        outputPath,
-        encoding,
-        videoDuration,
-        redisProgressKey,
-      });
-    } else if (isPreviewEncodingId(encoding.id)) {
-      await this.generatePreview({
-        location,
-        outputPath,
-        encoding,
-      });
-    } else if (encoding.id === EncodingId.thumbnail) {
-      await this.generateThumbnails({
-        location,
-        outputPath,
+    try {
+      if (isTranscodingEncodingId(encoding.id)) {
+        await this.transcodeVideo({
+          location,
+          outputPath,
+          encoding,
+          videoDuration,
+          redisProgressKey,
+        });
+      } else if (isPreviewEncodingId(encoding.id)) {
+        await this.generatePreview({
+          location,
+          outputPath,
+          encoding,
+        });
+      } else if (encoding.id === EncodingId.thumbnail) {
+        await this.generateThumbnails({
+          location,
+          outputPath,
+          videoId,
+          encoding,
+        });
+      } else {
+        throw new OperationNotValidError({
+          reason: 'Encoding id not supported.',
+          id: encoding.id,
+        });
+      }
+    } catch (error) {
+      this.logger.error({
+        message: 'Error during encoding process.',
         videoId,
-        encoding,
+        encodingId: encoding.id,
+        error,
       });
-    } else {
-      throw new OperationNotValidError({
-        reason: 'Encoding id not supported.',
-        id: encoding.id,
-      });
+
+      await this.redisClient.hset(redisProgressKey, { [encoding.id]: 'failed' });
+
+      throw error;
     }
 
     await this.redisClient.hset(redisProgressKey, { [encoding.id]: '100%' });
@@ -198,7 +211,7 @@ export class EncodeVideoAction {
           '-hls_playlist_type vod',
           '-hls_flags single_file',
           '-hls_segment_type fmp4',
-          '-hls_segment_filename output.mp4',
+          `-hls_segment_filename ${outputVideoPath}`,
         ])
         .output(`${outputPath}/playlist_${encoding.id}.m3u8`)
         .on('end', resolve)
