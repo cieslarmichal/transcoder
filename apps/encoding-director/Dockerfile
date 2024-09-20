@@ -11,7 +11,7 @@ RUN npm i -g turbo
 COPY package*.json ./
 COPY turbo.json ./
 COPY apps/ ./apps
-COPY libs/ ./common
+COPY libs/ ./libs
 COPY tsconfig.json ./
 
 RUN turbo prune --scope="@apps/encoding-director" --docker
