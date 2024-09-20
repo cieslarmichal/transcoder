@@ -46,7 +46,6 @@ export class Application {
     const uploadVideoAction = new UploadVideoAction(
       this.amqpChannel as AmqpChannel,
       s3Service,
-      this.redisClient,
       uuidService,
       this.logger,
       this.config,
