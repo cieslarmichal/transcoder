@@ -11,7 +11,6 @@ import {
   mapVideoContainerToContentType,
 } from '@libs/contracts';
 import { OperationNotValidError } from '@libs/errors';
-import { type RedisClient } from '@libs/redis';
 import { type AmqpChannel } from '@libs/amqp';
 import { type Config } from '../../config.js';
 import { type UuidService } from '@libs/uuid';
@@ -31,7 +30,6 @@ export class UploadVideoAction {
   public constructor(
     private readonly amqpChannel: AmqpChannel,
     private readonly s3Service: S3Service,
-    private readonly redisClient: RedisClient,
     private readonly uuidService: UuidService,
     private readonly logger: Logger,
     private readonly config: Config,
@@ -91,10 +89,6 @@ export class UploadVideoAction {
       blobName,
       videoUrl,
     });
-
-    const redisKey = `${videoId}-notification-email`;
-
-    await this.redisClient.set(redisKey, userEmail);
 
     const message = {
       videoId,

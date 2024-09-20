@@ -1,11 +1,6 @@
 import { OperationNotValidError } from '@libs/errors';
 
-import {
-  type UploadVideoQueryParamsDto,
-  type UploadVideoResponseBodyDto,
-  uploadVideoQueryParamsDtoSchema,
-  uploadVideoResponseBodyDtoSchema,
-} from './schemas/uploadVideoSchema.js';
+import { type UploadVideoResponseBodyDto, uploadVideoResponseBodyDtoSchema } from './schemas/uploadVideoSchema.js';
 import { type UploadVideoAction } from '../../../actions/uploadVideoAction/uploadVideoAction.js';
 import {
   type GetVideoEncodingProgressPathParamsDto,
@@ -48,9 +43,7 @@ export class VideoHttpController implements HttpController {
         method: HttpMethodName.post,
         handler: this.uploadVideo.bind(this),
         schema: {
-          request: {
-            queryParams: uploadVideoQueryParamsDtoSchema,
-          },
+          request: {},
           response: {
             [HttpStatusCode.created]: {
               schema: uploadVideoResponseBodyDtoSchema,
@@ -97,9 +90,7 @@ export class VideoHttpController implements HttpController {
     ];
   }
 
-  private async uploadVideo(
-    request: HttpRequest<undefined, UploadVideoQueryParamsDto>,
-  ): Promise<HttpCreatedResponse<UploadVideoResponseBodyDto>> {
+  private async uploadVideo(request: HttpRequest): Promise<HttpCreatedResponse<UploadVideoResponseBodyDto>> {
     const { notificationEmail } = request.queryParams;
 
     const requestFile = request.files?.[0];
