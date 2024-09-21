@@ -5,7 +5,7 @@ import { type Config, ConfigFactory } from './config.js';
 import { exchangeName, queueNames, routingKeys } from '@libs/contracts';
 import { VideoArtifactsUploadedMessageConsumer } from './api/messageConsumers/videoArtifactsUploadedConsumer.js';
 import { S3Service, S3ClientFactory } from '@libs/s3';
-import { CreateMasterPlaylistAction } from './actions/uploadVideoArtifactsAction/createMasterPlaylistAction.js';
+import { CreateMasterPlaylistAction } from './actions/createMasterPlaylistAction/createMasterPlaylistAction.js';
 
 export class Application {
   private readonly config: Config;

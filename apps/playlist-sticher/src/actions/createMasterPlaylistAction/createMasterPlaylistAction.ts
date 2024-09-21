@@ -1,6 +1,6 @@
 import { type Logger } from '@libs/logger';
 import { type Config } from '../../config.js';
-import { type EncodingId } from '@libs/contracts';
+import { isFullVideoFormat, type EncodingId } from '@libs/contracts';
 import { type S3Service } from '@libs/s3';
 
 export interface CreateMasterPlaylstActionPayload {
@@ -18,13 +18,32 @@ export class CreateMasterPlaylistAction {
   public async execute(payload: CreateMasterPlaylstActionPayload): Promise<void> {
     const { videoId, encodingId } = payload;
 
+    if (!isFullVideoFormat(encodingId)) {
+      this.logger.debug({
+        message: 'Skipping master playlist creation because artifact is not included in HLS playlist.',
+        videoId,
+        encodingId,
+      });
+
+      return;
+    }
+
     this.logger.debug({
       message: 'Creating master HLS playlist...',
       videoId,
       encodingId,
     });
 
-    console.log({ s3: this.s3Service, config: this.config });
+    const bucketName = this.config.aws.s3.encodingArtifactsBucket;
+
+    const { blobs: encodingArtifacts } = await this.s3Service.getBlobs({
+      bucketName,
+      prefix: videoId,
+    });
+
+    const hlsArtifacts = encodingArtifacts.filter(
+      (encodingArtifact) => encodingArtifact.name.endsWith('.ts') || encodingArtifact.name.endsWith('.m3u8'),
+    );
 
     this.logger.info({
       message: 'HLS master playlist created.',

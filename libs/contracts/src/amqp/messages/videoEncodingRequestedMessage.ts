@@ -12,8 +12,8 @@ export const videoEncodingRequestedMessageSchema = Type.Object({
     container: Type.Enum(EncodingContainer),
     width: Type.Integer({ minimum: 1 }),
     height: Type.Integer({ minimum: 1 }),
-    bitrate: Type.Integer({ minimum: 1 }),
-    fps: Type.Integer({ minimum: 1 }),
+    bitrate: Type.Optional(Type.Integer({ minimum: 1 })),
+    fps: Type.Optional(Type.Integer({ minimum: 1 })),
   }),
 });
 

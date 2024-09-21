@@ -7,8 +7,8 @@ import {
   type VideoEncodedMessage,
   type VideoContainer,
   type EncodingSpecification,
-  isTranscodingEncodingId,
-  isPreviewEncodingId,
+  isFullVideoFormat,
+  isPreviewFormat,
 } from '@libs/contracts';
 import { type AmqpChannel } from '@libs/amqp';
 import ffmpegPath from 'ffmpeg-static';
@@ -89,7 +89,7 @@ export class EncodeVideoAction {
     await this.redisClient.hset(redisProgressKey, { [encoding.id]: '0%' });
 
     try {
-      if (isTranscodingEncodingId(encoding.id)) {
+      if (isFullVideoFormat(encoding.id)) {
         await this.transcodeVideo({
           location,
           outputPath,
@@ -97,7 +97,7 @@ export class EncodeVideoAction {
           videoDuration,
           redisProgressKey,
         });
-      } else if (isPreviewEncodingId(encoding.id)) {
+      } else if (isPreviewFormat(encoding.id)) {
         await this.generatePreview({
           location,
           outputPath,
