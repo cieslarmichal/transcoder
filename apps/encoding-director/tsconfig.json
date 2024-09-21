@@ -3,7 +3,7 @@
   "compilerOptions": {
     "outDir": "./dist",
   },
-  "include": ["src/**/*.ts", "tests/**/*.ts", "src/actions/requestVideoEncodingsAction"],
+  "include": ["src/**/*.ts", "tests/**/*.ts"],
   "exclude": [],
   "references": [
     {

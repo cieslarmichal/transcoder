@@ -1,0 +1,17 @@
+{
+  "appName": "playlist-sticher",
+  "logLevel": "debug",
+  "aws": {
+    "accessKeyId": null,
+    "secretAccessKey": null,
+    "region": "eu-central-1",
+    "s3": {
+      "encodingArtifactsBucket": null
+    }
+  },
+  "amqp": {
+    "url": "amqp://test:test@transcoder-rabbitmq:5672",
+    "redeliveryDropThreshold": 3,
+    "messageTtl": 30000
+  }
+}

@@ -3,7 +3,7 @@
   "compilerOptions": {
     "outDir": "./dist",
   },
-  "include": ["src/**/*.ts", "../../libs/uuid/src/uuidService.ts"],
+  "include": ["src/**/*.ts", "tests/**/*.ts"],
   "references": [
     {
       "path": "../../libs/amqp/tsconfig.json"

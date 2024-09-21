@@ -3,8 +3,11 @@
   "compilerOptions": {
     "outDir": "./dist",
   },
-  "include": ["src/**/*.ts", "tests/**/*.ts"],
-  "exclude": [],
+  "include": ["src/**/*.ts"],
+  "exclude": [
+    "src/**/tests/**/*",
+    "src/**/*.test.ts"
+  ],
   "references": [
     {
       "path": "../../libs/amqp/tsconfig.json"
@@ -20,6 +23,6 @@
     },
     {
       "path": "../../libs/s3/tsconfig.json"
-    },
+    }
   ]
 }

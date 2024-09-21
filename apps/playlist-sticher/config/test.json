@@ -1,0 +1,13 @@
+{
+  "aws": {
+    "accessKeyId": "test",
+    "secretAccessKey": "test",
+    "endpoint": "http://127.0.0.1:4566",
+    "s3": {
+      "encodingArtifactsBucket": "encoding-artifacts"
+    }
+  },
+  "amqp": {
+    "url": "amqp://test:test@localhost:5672"
+  }
+}

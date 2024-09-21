@@ -94,6 +94,6 @@ export class UploadVideoArtifactsAction {
       encodingId,
     } satisfies VideoArtifactsUploadedMessage;
 
-    this.amqpChannel.publish(exchangeName, routingKeys.videoArtifactUploaded, Buffer.from(JSON.stringify(message)));
+    this.amqpChannel.publish(exchangeName, routingKeys.videoArtifactsUploaded, Buffer.from(JSON.stringify(message)));
   }
 }
