@@ -22,6 +22,7 @@
     "lint:fix": "npm run lint -- --fix"
   },
   "dependencies": {
+    "@libs/errors": "*",
     "@libs/logger": "*",
     "amqplib": "0.10.4"
   },

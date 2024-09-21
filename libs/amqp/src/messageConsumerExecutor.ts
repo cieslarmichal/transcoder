@@ -1,6 +1,7 @@
 import { type Channel, type Message } from 'amqplib';
 import { type MessageConsumer } from './messageConsumer.js';
 import { type Logger } from '@libs/logger';
+import { BaseError } from '@libs/errors';
 
 export class MessageConsumerExecutor {
   public constructor(
@@ -45,6 +46,9 @@ export class MessageConsumerExecutor {
           formattedError = {
             name: error.name,
             message: error.message,
+            stack: error.stack,
+            cause: error.cause,
+            context: error instanceof BaseError ? error.context : undefined,
           };
         }
 

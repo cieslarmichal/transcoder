@@ -6,6 +6,9 @@
   "include": ["src/**/*.ts"],
   "references": [
     {
+      "path": "../../libs/errors/tsconfig.json"
+    },
+    {
       "path": "../../libs/logger/tsconfig.json"
     }
   ],
