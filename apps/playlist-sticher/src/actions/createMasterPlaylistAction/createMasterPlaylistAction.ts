@@ -48,7 +48,9 @@ export class CreateMasterPlaylistAction {
     }
 
     const hlsPlaylists = encodingArtifacts
-      .filter((encodingArtifact) => encodingArtifact.name.endsWith('.m3u8'))
+      .filter(
+        (encodingArtifact) => encodingArtifact.name.endsWith('.m3u8') && !encodingArtifact.name.includes('master'),
+      )
       .sort((a, b) => a.name.localeCompare(b.name));
 
     const resolutions = hlsPlaylists.map(
@@ -59,6 +61,7 @@ export class CreateMasterPlaylistAction {
       message: 'Creating master HLS playlist...',
       videoId,
       encodingId,
+      resolutions,
     });
 
     const masterPlaylistPath = `/tmp/${resolutions.join('_')}.m3u8`;
