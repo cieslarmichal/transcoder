@@ -9,7 +9,7 @@ export type GetVideoEncodingArtifactsPathParamsDto = Static<typeof getVideoEncod
 export const getVideoEncodingArtifactsResponseBodyDtoSchema = Type.Object({
   data: Type.Array(
     Type.Object({
-      id: Type.String(),
+      name: Type.String(),
       url: Type.String(),
       contentType: Type.String(),
     }),

@@ -8,9 +8,9 @@ export interface GetVideoEncodingArtifactsActionPayload {
 
 export interface GetVideoEncodingArtifactsActionResult {
   readonly encodingArtifacts: {
-    readonly id: string;
-    readonly contentType: string;
+    readonly name: string;
     readonly url: string;
+    readonly contentType: string;
   }[];
 }
 
@@ -34,7 +34,7 @@ export class GetVideoEncodingArtifactsAction {
       videoId,
     });
 
-    const encodingArtifacts = await this.s3Service.getBlobsUrls({
+    const { blobs: encodingArtifacts } = await this.s3Service.getBlobs({
       bucketName,
       prefix: videoId,
     });
@@ -47,9 +47,9 @@ export class GetVideoEncodingArtifactsAction {
     });
 
     return {
-      encodingArtifacts: encodingArtifacts.map(({ name, url, contentType }) => ({
-        id: name.replace(`${videoId}/`, ''),
-        url,
+      encodingArtifacts: encodingArtifacts.map(({ name, contentType }) => ({
+        name: name.split('/').pop() as string,
+        url: `https://${bucketName}.s3.${this.config.aws.region}.amazonaws.com/${name}`,
         contentType,
       })),
     };

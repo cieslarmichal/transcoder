@@ -26,14 +26,18 @@ export interface UploadBlobResult {
   readonly location: string;
 }
 
-export interface GetBlobUrlPayload {
+export interface GetBlobSignedUrlPayload {
   readonly blobName: string;
   readonly bucketName: string;
 }
 
-export interface GetBlobsUrlsPayload {
+export interface GetBlobsPayload {
   readonly prefix: string;
   readonly bucketName: string;
+}
+
+export interface GetBlobsResult {
+  readonly blobs: { name: string; contentType: string }[];
 }
 
 export interface BlobExistsPayload {
@@ -78,7 +82,7 @@ export class S3Service {
     return { location: Location as string };
   }
 
-  public async getBlobUrl(payload: GetBlobUrlPayload): Promise<string> {
+  public async getBlobSignedUrl(payload: GetBlobSignedUrlPayload): Promise<string> {
     const { blobName, bucketName } = payload;
 
     const exists = await this.blobExists({
@@ -106,9 +110,7 @@ export class S3Service {
     return url;
   }
 
-  public async getBlobsUrls(
-    payload: GetBlobsUrlsPayload,
-  ): Promise<{ name: string; url: string; contentType: string }[]> {
+  public async getBlobs(payload: GetBlobsPayload): Promise<GetBlobsResult> {
     const { prefix, bucketName } = payload;
 
     const command = new ListObjectsV2Command({
@@ -119,33 +121,25 @@ export class S3Service {
     const result = await this.s3Client.send(command);
 
     if (!result.Contents) {
-      return [];
+      return { blobs: [] };
     }
 
-    return Promise.all(
+    const blobs = await Promise.all(
       result.Contents.map(async (data) => {
         const name = data.Key as string;
 
-        const [url, metadata] = await Promise.all([
-          getSignedUrl(
-            this.s3Client,
-            new GetObjectCommand({
-              Bucket: bucketName,
-              Key: name,
-            }),
-            { expiresIn: 86400 },
-          ),
-          this.s3Client.send(
-            new HeadObjectCommand({
-              Bucket: bucketName,
-              Key: name,
-            }),
-          ),
-        ]);
+        const metadata = await this.s3Client.send(
+          new HeadObjectCommand({
+            Bucket: bucketName,
+            Key: name,
+          }),
+        );
 
-        return { name, url, contentType: metadata.ContentType as string };
+        return { name, contentType: metadata.ContentType as string };
       }),
     );
+
+    return { blobs };
   }
 
   public async blobExists(payload: BlobExistsPayload): Promise<boolean> {

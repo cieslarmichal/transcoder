@@ -46,49 +46,65 @@ describe('GetVideoEncodingArtifactsAction', () => {
   it('gets video encoding artifacts', async () => {
     const videoId = faker.string.uuid();
 
-    const encoded360pBlobName = `${videoId}/360p`;
+    const encoded360pPlaylistName = `${videoId}/360p/playlist_360p.m3u8`;
 
-    const encodedPreviewBlobName = `${videoId}/preview`;
+    const m3u8ContentType = 'application/vnd.apple.mpegurl';
 
-    const encodedPreview360pBlobName = `${videoId}/preview_360p`;
+    const encoded360pVideoName = `${videoId}/360p/360p.ts`;
 
-    const contentType = 'video/mp4';
+    const tsContentType = 'video/mp2t';
+
+    const encodedPreviewBlobName = `${videoId}/preview/preview.mp4`;
+
+    const encodedPreview360pBlobName = `${videoId}/preview_360p/preview_360p.mp4`;
+
+    const mp4ContentType = 'video/mp4';
 
     await s3TestUtils.uploadObject(
       config.aws.s3.encodingArtifactsBucket,
-      encoded360pBlobName,
+      encoded360pPlaylistName,
       join(resourcesDirectory, sampleFileName),
-      contentType,
+      m3u8ContentType,
+    );
+
+    await s3TestUtils.uploadObject(
+      config.aws.s3.encodingArtifactsBucket,
+      encoded360pVideoName,
+      join(resourcesDirectory, sampleFileName),
+      tsContentType,
     );
 
     await s3TestUtils.uploadObject(
       config.aws.s3.encodingArtifactsBucket,
       encodedPreviewBlobName,
       join(resourcesDirectory, sampleFileName),
-      contentType,
+      mp4ContentType,
     );
 
     await s3TestUtils.uploadObject(
       config.aws.s3.encodingArtifactsBucket,
       encodedPreview360pBlobName,
       join(resourcesDirectory, sampleFileName),
-      contentType,
+      mp4ContentType,
     );
 
     const { encodingArtifacts } = await action.execute({ videoId });
 
-    encodingArtifacts.every((artifact) => {
-      expect(artifact.url).toContain(config.aws.s3.encodingArtifactsBucket);
-
-      expect(artifact.url).toContain(videoId);
-
-      expect(['360p', 'preview', 'preview_360p'].some((id) => artifact.url.includes(id))).toBe(true);
-    });
+    const expectedS3Url = `https://${config.aws.s3.encodingArtifactsBucket}.s3.${config.aws.region}.amazonaws.com`;
 
     expect(encodingArtifacts).toEqual([
-      { id: '360p', url: expect.any(String), contentType },
-      { id: 'preview', url: expect.any(String), contentType },
-      { id: 'preview_360p', url: expect.any(String), contentType },
+      { name: '360p.ts', url: `${expectedS3Url}/${videoId}/360p/360p.ts`, contentType: tsContentType },
+      {
+        name: 'playlist_360p.m3u8',
+        url: `${expectedS3Url}/${videoId}/360p/playlist_360p.m3u8`,
+        contentType: m3u8ContentType,
+      },
+      { name: 'preview.mp4', url: `${expectedS3Url}/${videoId}/preview/preview.mp4`, contentType: mp4ContentType },
+      {
+        name: 'preview_360p.mp4',
+        url: `${expectedS3Url}/${videoId}/preview_360p/preview_360p.mp4`,
+        contentType: mp4ContentType,
+      },
     ]);
   });
 

@@ -171,7 +171,7 @@ describe('S3Service', () => {
       const nonExistingBucketName = 'non-existing-bucket';
 
       try {
-        await s3Service.getBlobUrl({
+        await s3Service.getBlobSignedUrl({
           bucketName: nonExistingBucketName,
           blobName,
         });
@@ -188,7 +188,7 @@ describe('S3Service', () => {
       const nonExistingResourceName = 'non-existing-resource';
 
       try {
-        await s3Service.getBlobUrl({
+        await s3Service.getBlobSignedUrl({
           bucketName,
           blobName: nonExistingResourceName,
         });
@@ -204,7 +204,7 @@ describe('S3Service', () => {
     it('returns a signed URL', async () => {
       await s3TestUtils.uploadObject(bucketName, blobName, path.join(resourcesDirectory, sampleFileName));
 
-      const url = await s3Service.getBlobUrl({
+      const url = await s3Service.getBlobSignedUrl({
         bucketName,
         blobName,
       });
@@ -218,7 +218,7 @@ describe('S3Service', () => {
       const nonExistingBucketName = 'non-existing-bucket';
 
       try {
-        await s3Service.getBlobsUrls({
+        await s3Service.getBlobs({
           bucketName: nonExistingBucketName,
           prefix: 'prefix',
         });
@@ -248,23 +248,19 @@ describe('S3Service', () => {
         contentType: 'image/jpg',
       });
 
-      const result = await s3Service.getBlobsUrls({
+      const { blobs } = await s3Service.getBlobs({
         bucketName,
         prefix: blobName,
       });
 
-      expect(result.length).toBe(2);
+      expect(blobs.length).toBe(2);
 
-      result.forEach((item) => {
-        expect(item.name.startsWith(blobName)).toBe(true);
+      blobs.forEach((blob) => {
+        expect(blob.name.startsWith(blobName)).toBe(true);
 
-        expect(item.name.endsWith('1') || item.name.endsWith('2')).toBe(true);
+        expect(blob.name.endsWith('1') || blob.name.endsWith('2')).toBe(true);
 
-        expect(item.contentType).toBe('image/jpg');
-
-        expect(item.url.includes(blobName)).toBe(true);
-
-        expect(item.url.includes(bucketName)).toBe(true);
+        expect(blob.contentType).toBe('image/jpg');
       });
     });
   });

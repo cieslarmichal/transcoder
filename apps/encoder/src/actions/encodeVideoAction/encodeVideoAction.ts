@@ -187,15 +187,13 @@ export class EncodeVideoAction {
           '-keyint_min 48',
           '-hls_time 10',
           '-hls_playlist_type vod',
-          '-hls_segment_type mpegts',
-          `-hls_segment_filename ${outputPath}/segment_%03d.ts`,
+          '-hls_flags single_file',
+          `-hls_segment_filename ${outputPath}/${encoding.id}.ts`,
         ])
         .output(`${outputPath}/playlist_${encoding.id}.m3u8`)
         .on('end', resolve)
         .on('error', reject)
         .on('progress', async (event: FfmpegProgressEvent) => {
-          console.log({ transProgress: event });
-
           const percentageProgress = this.calculatePercentageProgress(event, videoDuration);
 
           await this.redisClient.hset(redisProgressKey, { [encoding.id]: `${percentageProgress}%` });
