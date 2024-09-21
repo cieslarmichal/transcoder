@@ -81,7 +81,7 @@
         "fps": 30
       },
       {
-        "id": "thumbnail",
+        "id": "thumbnails",
         "container": "jpg",
         "width": 160,
         "height": 90

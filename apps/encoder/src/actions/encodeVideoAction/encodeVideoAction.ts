@@ -1,7 +1,6 @@
 import { type Logger } from '@libs/logger';
 import { type Config } from '../../config.js';
 import {
-  EncodingId,
   exchangeName,
   routingKeys,
   type VideoEncodedMessage,
@@ -9,6 +8,7 @@ import {
   type EncodingSpecification,
   isFullVideoFormat,
   isPreviewFormat,
+  isThumbnailsFormat,
 } from '@libs/contracts';
 import { type AmqpChannel } from '@libs/amqp';
 import ffmpegPath from 'ffmpeg-static';
@@ -103,7 +103,7 @@ export class EncodeVideoAction {
           outputPath,
           encoding,
         });
-      } else if (encoding.id === EncodingId.thumbnail) {
+      } else if (isThumbnailsFormat(encoding.id)) {
         await this.generateThumbnails({
           location,
           outputPath,
@@ -188,7 +188,7 @@ export class EncodeVideoAction {
           '-hls_time 10',
           '-hls_playlist_type vod',
           '-hls_flags single_file',
-          `-hls_segment_filename ${outputPath}/${encoding.id}.ts`,
+          `-hls_segment_filename ${outputPath}/${encoding.width}x${encoding.height}x${encoding.bitrate}.${encoding.container}`,
         ])
         .output(`${outputPath}/playlist_${encoding.id}.m3u8`)
         .on('end', resolve)
@@ -219,7 +219,7 @@ export class EncodeVideoAction {
           `-b:v ${encoding.bitrate}k`,
           `-r ${encoding.fps}`,
         ])
-        .output(`${outputPath}/${encoding.id}.${encoding.container}`)
+        .output(`${outputPath}/${encoding.width}x${encoding.height}x${encoding.bitrate}.${encoding.container}`)
         .on('end', resolve)
         .on('error', reject)
         .run();

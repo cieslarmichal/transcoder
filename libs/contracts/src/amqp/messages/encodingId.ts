@@ -10,7 +10,7 @@ export enum EncodingId {
   'preview_480p' = 'preview_480p',
   'preview_720p' = 'preview_720p',
   'preview_1080p' = 'preview_1080p',
-  'thumbnail' = 'thumbnail',
+  'thumbnails' = 'thumbnails',
 }
 
 export function isFullVideoFormat(encodingId: EncodingId): boolean {
@@ -27,6 +27,6 @@ export function isPreviewFormat(encodingId: EncodingId): boolean {
   ].includes(encodingId);
 }
 
-export function isThumbnailFormat(encodingId: EncodingId): boolean {
-  return encodingId === EncodingId.thumbnail;
+export function isThumbnailsFormat(encodingId: EncodingId): boolean {
+  return encodingId === EncodingId.thumbnails;
 }
