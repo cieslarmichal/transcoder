@@ -47,15 +47,19 @@ export class CreateMasterPlaylistAction {
       return;
     }
 
-    const hlsPlaylists = encodingArtifacts
-      .filter(
-        (encodingArtifact) => encodingArtifact.name.endsWith('.m3u8') && !encodingArtifact.name.includes('master'),
-      )
-      .sort((a, b) => a.name.localeCompare(b.name));
-
-    const resolutions = hlsPlaylists.map(
-      (hlsPlaylist) => hlsPlaylist.name.split('/').pop()?.split('.')[0]?.replace('playlist_', '') as string,
+    const hlsPlaylists = encodingArtifacts.filter(
+      (encodingArtifact) => encodingArtifact.name.endsWith('.m3u8') && !encodingArtifact.name.includes('master'),
     );
+
+    const resolutions = hlsPlaylists
+      .map((hlsPlaylist) => hlsPlaylist.name.split('/').pop()?.split('.')[0]?.replace('playlist_', '') as string)
+      .sort((resolution1, resolution2) => {
+        const height1 = resolution1.replace('p', '');
+
+        const height2 = resolution2.replace('p', '');
+
+        return parseInt(height1, 10) - parseInt(height2, 10);
+      });
 
     this.logger.debug({
       message: 'Creating master HLS playlist...',
@@ -106,15 +110,10 @@ export class CreateMasterPlaylistAction {
       message: 'HLS master playlist created.',
       videoId,
       encodingId,
-    });
-
-    this.logger.debug({
-      message: 'Uploading HLS master playlist to S3...',
-      videoId,
       masterPlaylistPath,
     });
 
-    await this.s3Service.uploadBlob({
+    const { location } = await this.s3Service.uploadBlob({
       bucketName: this.config.aws.s3.encodingArtifactsBucket,
       blobName: `${videoId}/master_${resolutions.join('_')}.m3u8`,
       data: createReadStream(masterPlaylistPath),
@@ -124,21 +123,9 @@ export class CreateMasterPlaylistAction {
     this.logger.info({
       message: 'HLS master playlist uploaded to S3.',
       videoId,
-      masterPlaylistPath,
-    });
-
-    this.logger.debug({
-      message: 'Removing temporary master playlist file...',
-      videoId,
-      masterPlaylistPath,
+      location,
     });
 
     await unlink(masterPlaylistPath);
-
-    this.logger.debug({
-      message: 'Temporary master playlist file removed.',
-      videoId,
-      masterPlaylistPath,
-    });
   }
 }
