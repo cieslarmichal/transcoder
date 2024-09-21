@@ -1,4 +1,36 @@
-# Video transcoder service
+# Video transcoder system
+
+## Introduction
+
+The video transcoder system is a distributed system that allows users to upload videos and transcode them to different formats.
+One video will generate following artifacts:
+
+- Original video
+- Encoded videos in different formats with HLS playlist(1080p, 720p, 480p, 360p)
+- Preview videos for each format (first 4 seconds)
+- Master HLS playlist
+- Thumbnails image - grid of images from the video taken every 10 seconds
+
+## Technologies
+
+- Node.js
+- Typescript
+- RabbitMQ
+- Redis
+- S3
+- FFmpeg
+
+## Transcoding process
+
+1. User uploads a video
+2. API service uploads the video to S3
+3. Downloader service downloads the video from S3 to shared filesystem storage
+4. Encoding director service decides the encoding profiles for the video
+5. Encoder service encodes the video to the desired formats
+6. Uploader service uploads the video artifacts to S3
+7. Playlist sticher service creates a master playlist for the encoded videos
+
+All services communicate with each other via RabbitMQ.
 
 ## Architecture
 
