@@ -97,7 +97,20 @@ export class CreateMasterPlaylistAction {
 
       const [width, height, bitrate] = videoName.split('x');
 
-      masterPlaylistContent += `#EXT-X-STREAM-INF:BANDWIDTH=${bitrate},RESOLUTION=${width}x${height}\n`;
+      if (!width || !height || !bitrate) {
+        throw new OperationNotValidError({
+          reason: 'Video artifact name has invalid format.',
+          videoId,
+          videoName,
+          width,
+          height,
+          bitrate,
+        });
+      }
+
+      const bitrateBps = parseInt(bitrate, 10) * 1000;
+
+      masterPlaylistContent += `#EXT-X-STREAM-INF:BANDWIDTH=${bitrateBps},RESOLUTION=${width}x${height}\n`;
 
       const playlistPath = `${resolution}/playlist_${resolution}.m3u8`;
 
