@@ -1,6 +1,6 @@
 FROM node:20.17.0-alpine AS base
 
-RUN apk update
+RUN apk update && apk add --no-cache ffmpeg
 
 WORKDIR /app
 

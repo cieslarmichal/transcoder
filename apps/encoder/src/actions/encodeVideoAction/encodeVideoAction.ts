@@ -11,7 +11,6 @@ import {
   isThumbnailsFormat,
 } from '@libs/contracts';
 import { type AmqpChannel } from '@libs/amqp';
-import ffmpegPath from 'ffmpeg-static';
 import ffmpeg from 'fluent-ffmpeg';
 import { type RedisClient } from '@libs/redis';
 import { OperationNotValidError } from '@libs/errors';
@@ -143,7 +142,6 @@ export class EncodeVideoAction {
 
     await new Promise((resolve, reject) => {
       ffmpeg()
-        .setFfmpegPath(ffmpegPath as unknown as string)
         .input(location)
         .inputOptions('-y')
         .outputOptions([
@@ -180,7 +178,6 @@ export class EncodeVideoAction {
 
     await new Promise((resolve, reject) => {
       ffmpeg()
-        .setFfmpegPath(ffmpegPath as unknown as string)
         .input(location)
         .outputOptions([
           '-y',
@@ -208,14 +205,12 @@ export class EncodeVideoAction {
       const tempPattern = `${tempDir}/${videoId}_thumb%03d.png`;
 
       ffmpeg()
-        .setFfmpegPath(ffmpegPath as unknown as string)
         .input(location)
         .outputOptions(['-y', '-vf', 'fps=1/10,scale=320:240', '-frames:v 800'])
         .output(tempPattern)
         .on('end', async () => {
           await new Promise((resolveCombine, rejectCombine) => {
             ffmpeg()
-              .setFfmpegPath(ffmpegPath as unknown as string)
               .input(tempPattern)
               .outputOptions(['-y', '-filter_complex', 'tile=20x40'])
               .output(`${outputPath}/${encoding.id}.${encoding.container}`)
