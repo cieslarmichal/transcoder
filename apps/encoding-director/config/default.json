@@ -9,82 +9,12 @@
   "encoding": {
     "artifacts": [
       {
-        "id": "360p",
-        "container": "ts",
-        "width": 640,
-        "height": 360,
-        "bitrate": 1000,
-        "fps": 30
-      },
-      {
-        "id": "480p",
-        "container": "ts",
-        "width": 854,
-        "height": 480,
-        "bitrate": 1500,
-        "fps": 30
-      },
-      {
-        "id": "720p",
-        "container": "ts",
-        "width": 1280,
-        "height": 720,
-        "bitrate": 3500,
-        "fps": 30
-      },
-      {
-        "id": "1080p",
-        "container": "ts",
-        "width": 1920,
-        "height": 1080,
-        "bitrate": 6000,
-        "fps": 30
-      },
-      {
         "id": "preview",
         "container": "mp4",
         "width": 320,
         "height": 180,
         "bitrate": 400,
         "fps": 30
-      },
-      {
-        "id": "preview_360p",
-        "container": "mp4",
-        "width": 640,
-        "height": 360,
-        "bitrate": 1000,
-        "fps": 30
-      },
-      {
-        "id": "preview_480p",
-        "container": "mp4",
-        "width": 854,
-        "height": 480,
-        "bitrate": 1500,
-        "fps": 30
-      },
-      {
-        "id": "preview_720p",
-        "container": "mp4",
-        "width": 1280,
-        "height": 720,
-        "bitrate": 3500,
-        "fps": 30
-      },
-      {
-        "id": "preview_1080p",
-        "container": "mp4",
-        "width": 1920,
-        "height": 1080,
-        "bitrate": 6000,
-        "fps": 30
-      },
-      {
-        "id": "thumbnails",
-        "container": "jpg",
-        "width": 160,
-        "height": 90
       }
     ]
   }

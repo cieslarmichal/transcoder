@@ -1,10 +1,10 @@
 import { type Static, Type } from '@sinclair/typebox';
-import { pathPattern, uuidPattern } from './validationPatterns.js';
+import { uuidPattern } from './validationPatterns.js';
 import { VideoContainer } from './encodingContainer.js';
 
 export const videoDownloadedMessageSchema = Type.Object({
   videoId: Type.String({ pattern: uuidPattern }),
-  location: Type.String({ pattern: pathPattern }),
+  location: Type.String(),
   videoContainer: Type.Enum(VideoContainer),
 });
 

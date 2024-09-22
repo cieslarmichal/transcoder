@@ -12,7 +12,6 @@ import {
 } from '@libs/contracts';
 import { type AmqpChannel } from '@libs/amqp';
 import ffmpegPath from 'ffmpeg-static';
-import ffprobePath from 'ffprobe-static';
 import ffmpeg from 'fluent-ffmpeg';
 import { type RedisClient } from '@libs/redis';
 import { OperationNotValidError } from '@libs/errors';
@@ -25,15 +24,10 @@ export interface EncodeVideoActionPayload {
   readonly encoding: EncodingSpecification;
 }
 
-interface GetVideoDurationPayload {
-  readonly videoPath: string;
-}
-
 interface TranscodeVideoPayload {
   readonly location: string;
   readonly outputPath: string;
   readonly encoding: EncodingSpecification;
-  readonly videoDuration: number;
   readonly redisProgressKey: string;
 }
 
@@ -82,8 +76,6 @@ export class EncodeVideoAction {
 
     await mkdir(outputPath, { recursive: true });
 
-    const videoDuration = await this.getVideoDuration({ videoPath: location });
-
     const redisProgressKey = `${videoId}-encoding-progress`;
 
     await this.redisClient.hset(redisProgressKey, { [encoding.id]: '0%' });
@@ -94,7 +86,6 @@ export class EncodeVideoAction {
           location,
           outputPath,
           encoding,
-          videoDuration,
           redisProgressKey,
         });
       } else if (isPreviewFormat(encoding.id)) {
@@ -147,26 +138,8 @@ export class EncodeVideoAction {
     this.amqpChannel.publish(exchangeName, routingKeys.videoEncoded, Buffer.from(JSON.stringify(message)));
   }
 
-  private async getVideoDuration(payload: GetVideoDurationPayload): Promise<number> {
-    const { videoPath } = payload;
-
-    ffmpeg().setFfprobePath(ffprobePath.path);
-
-    return new Promise((resolve, reject) => {
-      ffmpeg.ffprobe(videoPath, (error, videoInfo) => {
-        if (error) {
-          return reject(error);
-        }
-
-        const { duration } = videoInfo.format;
-
-        return resolve(Math.floor(Number(duration)));
-      });
-    });
-  }
-
   private async transcodeVideo(payload: TranscodeVideoPayload): Promise<void> {
-    const { location, outputPath, encoding, videoDuration, redisProgressKey } = payload;
+    const { location, outputPath, encoding, redisProgressKey } = payload;
 
     await new Promise((resolve, reject) => {
       ffmpeg()
@@ -194,9 +167,9 @@ export class EncodeVideoAction {
         .on('end', resolve)
         .on('error', reject)
         .on('progress', async (event: FfmpegProgressEvent) => {
-          const percentageProgress = this.calculatePercentageProgress(event, videoDuration);
+          const progress = event.percent ? `${Math.floor(event.percent)}%` : 'unknown';
 
-          await this.redisClient.hset(redisProgressKey, { [encoding.id]: `${percentageProgress}%` });
+          await this.redisClient.hset(redisProgressKey, { [encoding.id]: progress });
         })
         .run();
     });
@@ -256,23 +229,5 @@ export class EncodeVideoAction {
         .on('error', reject)
         .run();
     });
-  }
-
-  private calculatePercentageProgress(progressEvent: FfmpegProgressEvent, videoDuration: number): number {
-    if (progressEvent.percent !== undefined) {
-      return Math.floor(progressEvent.percent);
-    }
-
-    const timeParts = progressEvent.timemark.split(':');
-
-    const hours = parseInt(timeParts[0] as string, 10);
-
-    const minutes = parseInt(timeParts[1] as string, 10);
-
-    const seconds = parseInt(timeParts[2] as string, 10);
-
-    const currentTimeInSeconds = hours * 3600 + minutes * 60 + seconds;
-
-    return Math.floor(currentTimeInSeconds / videoDuration) * 100;
   }
 }

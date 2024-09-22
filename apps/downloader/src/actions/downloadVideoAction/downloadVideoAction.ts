@@ -1,8 +1,5 @@
 import { type Logger } from '@libs/logger';
-import axios from 'axios';
 import { type Config } from '../../config.js';
-import { createWriteStream } from 'node:fs';
-import { OperationNotValidError } from '@libs/errors';
 import { exchangeName, routingKeys, type VideoDownloadedMessage, type VideoContainer } from '@libs/contracts';
 import { type AmqpChannel } from '@libs/amqp';
 
@@ -29,42 +26,42 @@ export class DownloadVideoAction {
       videoContainer,
     });
 
-    const response = await axios({
-      url: videoUrl,
-      method: 'GET',
-      responseType: 'stream',
-    });
+    // const response = await axios({
+    //   url: videoUrl,
+    //   method: 'GET',
+    //   responseType: 'stream',
+    // });
 
-    const contentType = response.headers['content-type'];
+    // const contentType = response.headers['content-type'];
 
-    if (!contentType) {
-      throw new OperationNotValidError({
-        reason: 'Missing content-type header.',
-        headers: response.headers,
-      });
-    }
+    // if (!contentType) {
+    //   throw new OperationNotValidError({
+    //     reason: 'Missing content-type header.',
+    //     headers: response.headers,
+    //   });
+    // }
 
-    const outputPath = `${this.config.sharedDirectory}/${videoId}.${videoContainer}`;
+    // const outputPath = `${this.config.sharedDirectory}/${videoId}.${videoContainer}`;
 
-    const writer = createWriteStream(outputPath);
+    // const writer = createWriteStream(outputPath);
 
-    response.data.pipe(writer);
+    // response.data.pipe(writer);
 
-    await new Promise((resolve, reject) => {
-      writer.on('finish', resolve);
+    // await new Promise((resolve, reject) => {
+    //   writer.on('finish', resolve);
 
-      writer.on('error', reject);
-    });
+    //   writer.on('error', reject);
+    // });
 
     this.logger.info({
       message: 'Video downloaded.',
       videoId,
-      outputPath,
+      config: this.config,
     });
 
     const message = {
       videoId,
-      location: outputPath,
+      location: videoUrl,
       videoContainer,
     } satisfies VideoDownloadedMessage;
 
