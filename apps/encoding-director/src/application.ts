@@ -16,10 +16,7 @@ export class Application {
   public constructor() {
     this.config = ConfigFactory.create();
 
-    this.logger = LoggerFactory.create({
-      appName: this.config.appName,
-      logLevel: this.config.logLevel,
-    });
+    this.logger = LoggerFactory.create(this.config);
 
     this.amqpProvisioner = new AmqpProvisioner(this.logger);
   }
