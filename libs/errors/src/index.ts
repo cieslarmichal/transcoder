@@ -11,3 +11,5 @@ export * from './repositoryError.js';
 export * from './resourceAlreadyExistsError.js';
 
 export * from './resourceNotFoundError.js';
+
+export * from './finalErrorHandler.js';
