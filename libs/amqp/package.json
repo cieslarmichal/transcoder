@@ -24,10 +24,10 @@
   "dependencies": {
     "@libs/errors": "*",
     "@libs/logger": "*",
-    "amqplib": "0.10.4"
+    "amqplib": "0.10.5"
   },
   "devDependencies": {
-    "@types/amqplib": "0.10.5"
+    "@types/amqplib": "0.10.6"
   },
   "volta": {
     "node": "22.11.0",
