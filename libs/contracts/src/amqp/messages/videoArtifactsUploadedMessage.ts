@@ -1,6 +1,7 @@
 import { type Static, Type } from '@sinclair/typebox';
-import { uuidPattern } from './validationPatterns.js';
+
 import { EncodingId } from './encodingId.js';
+import { uuidPattern } from './validationPatterns.js';
 
 export const videoArtifactsUploadedMessageSchema = Type.Object({
   videoId: Type.String({ pattern: uuidPattern }),

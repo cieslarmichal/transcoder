@@ -1,18 +1,18 @@
 import { faker } from '@faker-js/faker';
 import { createReadStream } from 'node:fs';
-import { expect, describe, it, beforeEach, afterEach } from 'vitest';
 import { resolve, join } from 'node:path';
+import { expect, describe, it, beforeEach, afterEach } from 'vitest';
 
-import { LoggerFactory } from '@libs/logger';
-import { S3ClientFactory, S3Service } from '@libs/s3';
-import { S3TestUtils } from '@libs/s3/tests';
-
-import { UploadVideoAction } from './uploadVideoAction.js';
-import { ConfigFactory, type Config } from '../../config.js';
 import { AmqpProvisioner, type AmqpChannel, type AmqpConnection, type AmqpGetMessageResult } from '@libs/amqp';
 import { exchangeName, queueNames, routingKeys, type VideoIngestedMessage } from '@libs/contracts';
 import { OperationNotValidError } from '@libs/errors';
+import { LoggerFactory } from '@libs/logger';
+import { S3ClientFactory, S3Service } from '@libs/s3';
+import { S3TestUtils } from '@libs/s3/tests';
 import { type UuidService } from '@libs/uuid';
+
+import { UploadVideoAction } from './uploadVideoAction.js';
+import { ConfigFactory, type Config } from '../../config.js';
 
 describe('UploadVideoAction', () => {
   let action: UploadVideoAction;

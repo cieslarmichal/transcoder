@@ -1,5 +1,6 @@
-import { type Logger } from '@libs/logger';
 import { Redis } from 'ioredis';
+
+import { type Logger } from '@libs/logger';
 
 export interface RedisClientConfig {
   readonly host: string;

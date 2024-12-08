@@ -1,5 +1,7 @@
-import { type Logger } from '@libs/logger';
-import { type Config } from '../../config.js';
+import ffmpeg from 'fluent-ffmpeg';
+import { mkdir } from 'fs/promises';
+
+import { type AmqpChannel } from '@libs/amqp';
 import {
   exchangeName,
   routingKeys,
@@ -10,11 +12,11 @@ import {
   isPreviewFormat,
   isThumbnailsFormat,
 } from '@libs/contracts';
-import { type AmqpChannel } from '@libs/amqp';
-import ffmpeg from 'fluent-ffmpeg';
-import { type RedisClient } from '@libs/redis';
 import { OperationNotValidError } from '@libs/errors';
-import { mkdir } from 'fs/promises';
+import { type Logger } from '@libs/logger';
+import { type RedisClient } from '@libs/redis';
+
+import { type Config } from '../../config.js';
 
 export interface EncodeVideoActionPayload {
   readonly videoId: string;

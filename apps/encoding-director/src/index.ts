@@ -1,4 +1,5 @@
 import { createFinalErrorHandler } from '@libs/errors';
+
 import { Application } from './application.js';
 
 const teardownCallback = async (): Promise<void> => {

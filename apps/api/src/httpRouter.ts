@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
 import { type FastifyInstance, type FastifyReply, type FastifyRequest, type FastifySchema } from 'fastify';
-
 import { createWriteStream } from 'node:fs';
-import { promisify } from 'node:util';
 import { pipeline } from 'node:stream';
+import { promisify } from 'node:util';
+
 import {
   type HttpController,
   type HttpRoute,

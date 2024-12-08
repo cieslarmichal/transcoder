@@ -1,4 +1,5 @@
 import { type HttpController, HttpRoute, HttpMethodName, HttpStatusCode, type HttpOkResponse } from '@libs/http';
+
 import { checkHealthResponseBodySchema, type CheckHealthResponseBody } from './schemas/checkHealthSchema.js';
 
 export class ApplicationHttpController implements HttpController {

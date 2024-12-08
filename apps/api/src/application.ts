@@ -1,16 +1,16 @@
 import { AmqpProvisioner, type AmqpChannel, type AmqpConnection } from '@libs/amqp';
 import { type Logger, LoggerFactory } from '@libs/logger';
+import { RedisClientFactory, type RedisClient } from '@libs/redis';
 import { S3ClientFactory, S3Service } from '@libs/s3';
+import { UuidService } from '@libs/uuid';
 
+import { GetVideoEncodingArtifactsAction } from './actions/getVideoEncodingArtifactsAction/getVideoEncodingArtifactsAction.js';
+import { GetVideoEncodingProgressAction } from './actions/getVideoEncodingProgressAction/getVideoEncodingProgressAction.js';
 import { UploadVideoAction } from './actions/uploadVideoAction/uploadVideoAction.js';
 import { ApplicationHttpController } from './api/httpControllers/applicationHttpController/applicationHttpController.js';
 import { VideoHttpController } from './api/httpControllers/videoHttpController/videoHttpController.js';
 import { type Config, ConfigFactory } from './config.js';
 import { HttpServer } from './httpServer.js';
-import { RedisClientFactory, type RedisClient } from '@libs/redis';
-import { GetVideoEncodingProgressAction } from './actions/getVideoEncodingProgressAction/getVideoEncodingProgressAction.js';
-import { GetVideoEncodingArtifactsAction } from './actions/getVideoEncodingArtifactsAction/getVideoEncodingArtifactsAction.js';
-import { UuidService } from '@libs/uuid';
 
 export class Application {
   private readonly config: Config;

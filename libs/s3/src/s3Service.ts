@@ -10,8 +10,9 @@ import {
   type S3Client,
 } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
-import { type Readable } from 'node:stream';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import { type Readable } from 'node:stream';
+
 import { OperationNotValidError } from '@libs/errors';
 
 export interface UploadBlobPayload {

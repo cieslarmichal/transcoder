@@ -1,5 +1,8 @@
-import { type Logger } from '@libs/logger';
-import { type Config } from '../../config.js';
+import { createReadStream } from 'node:fs';
+import { readdir, rm } from 'node:fs/promises';
+import { join } from 'node:path';
+
+import { type AmqpChannel } from '@libs/amqp';
 import {
   type EncodingId,
   exchangeName,
@@ -8,11 +11,10 @@ import {
   routingKeys,
   type VideoArtifactsUploadedMessage,
 } from '@libs/contracts';
-import { type AmqpChannel } from '@libs/amqp';
+import { type Logger } from '@libs/logger';
 import { type S3Service } from '@libs/s3';
-import { createReadStream } from 'node:fs';
-import { readdir, rm } from 'node:fs/promises';
-import { join } from 'node:path';
+
+import { type Config } from '../../config.js';
 
 export interface UploadVideoArtifactsActionPayload {
   readonly videoId: string;

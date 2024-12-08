@@ -1,10 +1,10 @@
 import { type AmqpChannel, type AmqpConnection, AmqpProvisioner, MessageConsumerExecutor } from '@libs/amqp';
+import { exchangeName, queueNames, routingKeys } from '@libs/contracts';
 import { type Logger, LoggerFactory } from '@libs/logger';
 
-import { type Config, ConfigFactory } from './config.js';
-import { exchangeName, queueNames, routingKeys } from '@libs/contracts';
-import { VideoIngestedMessageConsumer } from './api/messageConsumers/videoIngestedMessageConsumer.js';
 import { DownloadVideoAction } from './actions/downloadVideoAction/downloadVideoAction.js';
+import { VideoIngestedMessageConsumer } from './api/messageConsumers/videoIngestedMessageConsumer.js';
+import { type Config, ConfigFactory } from './config.js';
 
 export class Application {
   private readonly config: Config;

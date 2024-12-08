@@ -1,6 +1,8 @@
-import { type ConsumePayload, type MessageConsumer } from '@libs/amqp';
 import { Value } from '@sinclair/typebox/value';
+
+import { type ConsumePayload, type MessageConsumer } from '@libs/amqp';
 import { videoArtifactsUploadedMessageSchema } from '@libs/contracts';
+
 import { type CreateMasterPlaylistAction } from '../../actions/createMasterPlaylistAction/createMasterPlaylistAction.js';
 
 export class VideoArtifactsUploadedMessageConsumer implements MessageConsumer {

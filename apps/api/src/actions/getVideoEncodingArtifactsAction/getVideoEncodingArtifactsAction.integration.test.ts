@@ -1,13 +1,13 @@
 import { faker } from '@faker-js/faker';
+import { join, resolve } from 'node:path';
 import { expect, describe, it, beforeEach, afterEach } from 'vitest';
 
 import { LoggerFactory } from '@libs/logger';
-
-import { ConfigFactory, type Config } from '../../config.js';
-import { GetVideoEncodingArtifactsAction } from './getVideoEncodingArtifactsAction.js';
 import { S3ClientFactory, S3Service } from '@libs/s3';
 import { S3TestUtils } from '@libs/s3/tests';
-import { join, resolve } from 'node:path';
+
+import { GetVideoEncodingArtifactsAction } from './getVideoEncodingArtifactsAction.js';
+import { ConfigFactory, type Config } from '../../config.js';
 
 describe('GetVideoEncodingArtifactsAction', () => {
   let action: GetVideoEncodingArtifactsAction;

@@ -1,5 +1,6 @@
-import { type Logger } from '@libs/logger';
 import { type Channel, connect, type Connection } from 'amqplib';
+
+import { type Logger } from '@libs/logger';
 
 export interface CreateConnectionPayload {
   readonly url: string;

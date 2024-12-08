@@ -1,10 +1,12 @@
-import { type Logger } from '@libs/logger';
-import { type Config } from '../../config.js';
-import { exchangeName, routingKeys, type VideoDownloadedMessage, type VideoContainer } from '@libs/contracts';
-import { type AmqpChannel } from '@libs/amqp';
-import { OperationNotValidError } from '@libs/errors';
 import axios from 'axios';
 import { createWriteStream } from 'node:fs';
+
+import { type AmqpChannel } from '@libs/amqp';
+import { exchangeName, routingKeys, type VideoDownloadedMessage, type VideoContainer } from '@libs/contracts';
+import { OperationNotValidError } from '@libs/errors';
+import { type Logger } from '@libs/logger';
+
+import { type Config } from '../../config.js';
 
 export interface DownloadVideoActionPayload {
   readonly videoId: string;

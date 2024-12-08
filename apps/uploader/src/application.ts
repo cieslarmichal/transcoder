@@ -1,11 +1,11 @@
 import { type AmqpChannel, type AmqpConnection, AmqpProvisioner, MessageConsumerExecutor } from '@libs/amqp';
-import { type Logger, LoggerFactory } from '@libs/logger';
-
-import { type Config, ConfigFactory } from './config.js';
 import { exchangeName, queueNames, routingKeys } from '@libs/contracts';
-import { VideoEncodedMessageConsumer } from './api/messageConsumers/videoEncodedMessageConsumer.js';
+import { type Logger, LoggerFactory } from '@libs/logger';
 import { S3Service, S3ClientFactory } from '@libs/s3';
+
 import { UploadVideoArtifactsAction } from './actions/uploadVideoArtifactsAction/uploadVideoArtifactsAction.js';
+import { VideoEncodedMessageConsumer } from './api/messageConsumers/videoEncodedMessageConsumer.js';
+import { type Config, ConfigFactory } from './config.js';
 
 export class Application {
   private readonly config: Config;

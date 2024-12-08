@@ -11,11 +11,11 @@ import { fastify, type FastifyInstance } from 'fastify';
 import { type FastifySchemaValidationError } from 'fastify/types/schema.js';
 
 import { BaseError, InputNotValidError, OperationNotValidError, ResourceNotFoundError } from '@libs/errors';
+import { HttpStatusCode, type HttpController } from '@libs/http';
 import { type Logger } from '@libs/logger';
 
 import { type Config } from './config.js';
 import { HttpRouter } from './httpRouter.js';
-import { HttpStatusCode, type HttpController } from '@libs/http';
 
 export class HttpServer {
   private readonly fastifyServer: FastifyInstance;

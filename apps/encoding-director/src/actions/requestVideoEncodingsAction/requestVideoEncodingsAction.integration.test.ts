@@ -1,10 +1,6 @@
 import { faker } from '@faker-js/faker';
 import { expect, describe, it, beforeEach, afterEach } from 'vitest';
 
-import { LoggerFactory } from '@libs/logger';
-
-import { RequestVideoEncodingsAction } from './requestVideoEncodingsAction.js';
-import { ConfigFactory, type Config } from '../../config.js';
 import { AmqpProvisioner, type AmqpChannel, type AmqpConnection, type AmqpGetMessageResult } from '@libs/amqp';
 import {
   exchangeName,
@@ -13,6 +9,10 @@ import {
   VideoContainer,
   type VideoEncodingRequestedMessage,
 } from '@libs/contracts';
+import { LoggerFactory } from '@libs/logger';
+
+import { RequestVideoEncodingsAction } from './requestVideoEncodingsAction.js';
+import { ConfigFactory, type Config } from '../../config.js';
 
 describe('RequestVideoEncodingsAction', () => {
   let action: RequestVideoEncodingsAction;

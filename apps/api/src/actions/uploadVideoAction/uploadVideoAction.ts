@@ -1,8 +1,6 @@
 import { type Readable } from 'node:stream';
 
-import { type Logger } from '@libs/logger';
-import { type S3Service } from '@libs/s3';
-
+import { type AmqpChannel } from '@libs/amqp';
 import {
   exchangeName,
   routingKeys,
@@ -11,9 +9,11 @@ import {
   mapVideoContainerToContentType,
 } from '@libs/contracts';
 import { OperationNotValidError } from '@libs/errors';
-import { type AmqpChannel } from '@libs/amqp';
-import { type Config } from '../../config.js';
+import { type Logger } from '@libs/logger';
+import { type S3Service } from '@libs/s3';
 import { type UuidService } from '@libs/uuid';
+
+import { type Config } from '../../config.js';
 
 export interface UploadVideoActionPayload {
   readonly fileName: string;
