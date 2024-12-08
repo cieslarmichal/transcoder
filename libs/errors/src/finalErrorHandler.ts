@@ -23,6 +23,6 @@ export const createFinalErrorHandler = (teardownCallback?: () => Promise<void>) 
       await teardownCallback();
     }
 
-    process.exitCode = 1;
+    process.exit(1);
   };
 };
