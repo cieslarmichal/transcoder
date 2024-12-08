@@ -1,4 +1,4 @@
-FROM node:20.17.0-alpine AS base
+FROM node:22.11.0-alpine AS base
 
 RUN apk update
 
